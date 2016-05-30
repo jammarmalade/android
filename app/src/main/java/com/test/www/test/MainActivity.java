@@ -20,11 +20,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"onCreate");
+        Log.d(TAG,"Main Task id is "+getTaskId());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
         Button startSecond = (Button)findViewById(R.id.start_second_activity);
-        Button startThird = (Button)findViewById(R.id.start_third_activity);
         startSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -32,13 +31,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
-        startThird.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this , ThirdActivity.class);
-                startActivity(intent);
-            }
-        });
+
         //判断活动被销毁之前是否有保存数据(onSaveInstanceState方法调用)
         if(savedInstanceState != null){
             String tmpData = savedInstanceState.getString("data");
