@@ -79,6 +79,7 @@ public class MainActivity extends BaseActivity {
                         progressDialog.setMessage("Loading");
                         progressDialog.setCancelable(true);
                         progressDialog.show();
+                        
                         break;
                     default:
                         break;
