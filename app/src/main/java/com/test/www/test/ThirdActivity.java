@@ -17,13 +17,6 @@ public class ThirdActivity extends BaseActivity {
         Log.d("MainActivity","Third Task id is "+getTaskId());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.third_layout);
-        Button btn_exit = (Button)findViewById(R.id.btn_exit);
-        btn_exit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //调用活动管理器退出程序
-                ActivityCollector.finishAll();
-            }
-        });
+
     }
 }
