@@ -7,4 +7,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="this is dialog activity"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_exit"
+        android:text="@string/btn_exit"/>
 </LinearLayout>

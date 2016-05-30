@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import java.net.Inet4Address;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
     public static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {

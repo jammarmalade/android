@@ -11,7 +11,7 @@ import android.widget.Button;
 /**
  * Created by Administrator on 2016/5/28.
  */
-public class SecondActivity extends Activity {
+public class SecondActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
