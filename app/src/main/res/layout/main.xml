@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 引入布局 -->
-    <!--<include layout="@layout/title" />-->
-    <!-- 自定义控件的使用 -->
-    <com.test.www.test.TitleLayout
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></com.test.www.test.TitleLayout>
+        android:layout_height="match_parent"
+        android:id="@+id/list_view">
+
+    </ListView>
 </LinearLayout>
