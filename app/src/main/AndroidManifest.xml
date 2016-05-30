@@ -19,22 +19,12 @@
         </activity>
         <!-- 第二个活动 -->
         <activity android:name=".SecondActivity">
-            <intent-filter>
-                <!-- 隐式响应 -->
-                <action android:name="com.test.mainactivity.ACTION_START" />
-                <!-- 默认的 category -->
-                <category android:name="android.intent.category.DEFAULT"/>
-                <!-- 自定义的 category -->
-                <category android:name="com.test.mainactivity.MY_CATEGORY"/>
-            </intent-filter>
+
         </activity>
         <!-- 第三个活动 -->
-        <activity android:name=".ThirdActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="https"/>
-            </intent-filter>
+        <!-- @android:style/Theme.Dialog 此活动是对话框模式 -->
+        <activity android:name=".ThirdActivity" android:theme="@android:style/Theme.Dialog">
+
         </activity>
     </application>
 
