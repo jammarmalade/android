@@ -27,8 +27,10 @@ public class MainActivity extends BaseActivity {
         startSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this , SecondActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(MainActivity.this , SecondActivity.class);
+//                startActivity(intent);
+                //最佳的启动活动的方法
+                SecondActivity.actionStart(MainActivity.this, "this is test");
             }
         });
 

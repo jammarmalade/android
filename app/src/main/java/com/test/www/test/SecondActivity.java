@@ -1,6 +1,7 @@
 package com.test.www.test;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,4 +29,14 @@ public class SecondActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 应该为每个活动都添加这样的启动方法，方便调用
+     * @param context   启动被活动的上级活动
+     * @param data      要传递给本活动的数据
+     */
+    public static void actionStart(Context context, String data){
+        Intent intent = new Intent(context , SecondActivity.class);
+        intent.putExtra("data",data);
+        context.startActivity(intent);
+    }
 }
