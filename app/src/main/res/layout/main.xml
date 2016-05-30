@@ -1,42 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/text_view"
-        android:text="this test TextView"
-        android:gravity="center"
-        android:textSize="24sp"
-        android:textColor="#00ff00"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:textSize="24sp"
-        android:text="Button"/>
+
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_text"
-        android:hint="Type your tel number"
-        android:maxLines="2"/>
-    <ImageView
-        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/input_message"
+        android:hint="Type Something"/>
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/image_view"
-        android:src="@drawable/t"/>
-    <!--
-    进度条
-    默认为圆形进度条
-    style="?android:attr/progressBarStyleHorizontal"  设置为水平进度条并设置最大值为100
-     -->
-    <ProgressBar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:max="100"/>
+        android:id="@+id/button1"
+        android:text="Button 1"/>
+
+
 </LinearLayout>

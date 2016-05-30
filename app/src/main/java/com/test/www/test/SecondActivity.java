@@ -19,24 +19,8 @@ public class SecondActivity extends BaseActivity {
         Log.d("MainActivity","Second Task id is "+getTaskId());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.second_layout);
-        Button btn_second = (Button)findViewById(R.id.btn_second);
-        btn_second.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SecondActivity.this , ThirdActivity.class);
-                startActivity(intent);
-            }
-        });
+
     }
 
-    /**
-     * 应该为每个活动都添加这样的启动方法，方便调用
-     * @param context   启动被活动的上级活动
-     * @param data      要传递给本活动的数据
-     */
-    public static void actionStart(Context context, String data){
-        Intent intent = new Intent(context , SecondActivity.class);
-        intent.putExtra("data",data);
-        context.startActivity(intent);
-    }
+
 }
