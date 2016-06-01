@@ -3,9 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
+    <ListView
+        android:id="@+id/contacts_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/test"
-        android:text="@string/test"/>
+        android:layout_height="match_parent" >
+    </ListView>
 </LinearLayout>

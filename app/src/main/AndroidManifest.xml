@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.test.www.test">
+    <!-- 读取联系人的权限 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- 应用图标 ic_launcher -->
     <!-- 应用名称 app_name -->
     <application
