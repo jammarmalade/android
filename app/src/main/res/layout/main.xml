@@ -3,22 +3,41 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/edit"
+    <Button
+        android:id="@+id/create_database"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Type something here"
+        android:text="Create database"
         />
     <Button
-        android:id="@+id/save_data"
+        android:id="@+id/add_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save data"
+        android:text="Add data"
         />
     <Button
-        android:id="@+id/restore_data"
+        android:id="@+id/update_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restore data"
+        android:text="Update data"
+        />
+    <Button
+        android:id="@+id/delete_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete data"
+        />
+    <Button
+        android:id="@+id/query_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Query data"
+        />
+
+    <Button
+        android:id="@+id/replace_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Replace data"
         />
 </LinearLayout>
