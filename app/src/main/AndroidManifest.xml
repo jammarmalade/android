@@ -18,14 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- 第二个活动 -->
-        <activity android:name=".SecondActivity" android:launchMode="singleInstance">
-
-        </activity>
-        <!-- 第三个活动 -->
-        <activity android:name=".ThirdActivity" >
-
-        </activity>
+ 
     </application>
 
 </manifest>
