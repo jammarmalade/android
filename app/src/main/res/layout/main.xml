@@ -4,8 +4,8 @@
     android:layout_height="match_parent">
 
     <Button
+        android:id="@+id/force_offline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/test"
-        android:text="Send Broadcast"/>
+        android:text="Send force offline broadcast" />
 </LinearLayout>
