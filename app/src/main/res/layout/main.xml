@@ -6,11 +6,6 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/start_second_activity"
-        android:text="@string/start_second_activity"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/start_third_activity"
-        android:text="@string/start_third_activity"/>
+        android:id="@+id/test"
+        android:text="@string/test"/>
 </LinearLayout>

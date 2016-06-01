@@ -1,8 +1,4 @@
 <resources>
     <string name="app_name">Jam test</string>
     <string name="test">哈哈哈哈，测试一下</string>
-    <string name="btn_second">活动二的按钮</string>
-    <string name="btn_exit">退出程序</string>
-    <string name="start_second_activity">启动第二个活动</string>
-    <string name="start_third_activity">启动第三个活动（对话框）</string>
 </resources>
