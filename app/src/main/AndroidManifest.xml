@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.test.www.test">
+    <uses-sdk
+        android:minSdkVersion="17"/>
+    <!-- 闪光灯权限 -->
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    <!-- 震动权限 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 应用图标 ic_launcher -->
     <!-- 应用名称 app_name -->
     <application
@@ -18,7 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
- 
+        <activity android:name=".NotificationActivity" >
+        </activity>
     </application>
 
 </manifest>
