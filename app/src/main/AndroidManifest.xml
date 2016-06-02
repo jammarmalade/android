@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.FLASHLIGHT"/>
     <!-- 震动权限 -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 接收短信的权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <!-- 应用图标 ic_launcher -->
     <!-- 应用名称 app_name -->
     <application
