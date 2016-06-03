@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -30,108 +31,65 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener{
     public static final String TAG = "MainActivity";
-    public static final int TAKE_PHOTO = 1;
-    public static final int CROP_PHOTO = 2;
-    private Button takePhoto;
-    private ImageView picture;
-    private Uri imageUri;
-    private Button chooseFromAlbum;
+    private Button play;
+    private Button pause;
+    private Button stop;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
-        //拍照
-        takePhoto = (Button) findViewById(R.id.take_photo);
-        picture = (ImageView) findViewById(R.id.picture);
-        takePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 创建File对象，用于存储拍照后的图片
-                //Environment.getExternalStorageDirectory() 获取到的就是手机 SD 卡的根目录
-                File outputImage = new File(Environment.getExternalStorageDirectory(), "tempImage.jpg");
-
-                try {
-                    if (outputImage.exists()) {
-                        outputImage.delete();
-                    }
-                    outputImage.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                //将 File 对象转换成 Uri 对象
-                imageUri = Uri.fromFile(outputImage);
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                //指定图片的输出地址
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                //隐式  Intent,拍下的照片将会输出到 output_image.jpg 中
-                startActivityForResult(intent, TAKE_PHOTO); // 启动相机程序
-            }
-        });
-
-        //从相册中选择
-        chooseFromAlbum = (Button) findViewById(R.id.choose_from_album);
-        chooseFromAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imageUri = Uri.parse("file://"+Environment.getExternalStorageDirectory()+"/tempImage.jpg");
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT,null);
-                intent.setType("image/*");
-                intent.putExtra("crop", "true");//可裁剪
-                intent.putExtra("aspectX", 2);
-                intent.putExtra("aspectY", 1);
-                intent.putExtra("outputX", 600);
-                intent.putExtra("outputY", 300);
-                intent.putExtra("scale", true);//可缩放
-                intent.putExtra("return-data", false);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, CROP_PHOTO);
-
-            }
-        });
+        play = (Button) findViewById(R.id.play);
+        pause = (Button) findViewById(R.id.pause);
+        stop = (Button) findViewById(R.id.stop);
+        play.setOnClickListener(this);
+        pause.setOnClickListener(this);
+        stop.setOnClickListener(this);
+        // 初始化MediaPlayer
+        initMediaPlayer();
     }
 
-    /**
-     * 照相完成后调用
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
+    private void initMediaPlayer() {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory(), "nrhy.mp3");
+            Log.d(TAG,file.getPath());
+            mediaPlayer.setDataSource(file.getPath()); // 指定音频文件的路径
+            mediaPlayer.prepare(); // 让MediaPlayer进入到准备状态
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case TAKE_PHOTO:
-                if (resultCode == RESULT_OK) {
-                    //照相成功，构建一个 Intent 对照片进行裁剪
-                    Intent intent = new Intent("com.android.camera.action.CROP");
-                    intent.setDataAndType(imageUri, "image/*");
-                    intent.putExtra("scale", true);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                    startActivityForResult(intent, CROP_PHOTO); // 启动裁剪程序
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.play:
+                if (!mediaPlayer.isPlaying()) {
+                    mediaPlayer.start(); // 开始播放
                 }
                 break;
-            case CROP_PHOTO:
-                if (resultCode == RESULT_OK) {
-                    //裁剪成功
-                    try {
-                        Log.d(TAG,"130");
-                        //调用 BitmapFactory 的 decodeStream()方法将 output_image.jpg 这张照片解析成 Bitmap 对象
-                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-
-                        picture.setImageBitmap(bitmap); // 将裁剪后的照片显示出来
-                        picture.setVisibility(View.VISIBLE);
-                    } catch (FileNotFoundException e) {
-                        Log.d(TAG,"136");
-                        e.printStackTrace();
-                    }
+            case R.id.pause:
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause(); // 暂停播放
+                }
+                break;
+            case R.id.stop:
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.reset(); // 停止播放
+                    initMediaPlayer();
                 }
                 break;
             default:
                 break;
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
         }
     }
 
