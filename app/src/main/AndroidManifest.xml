@@ -18,8 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MyService" ></service>
-        <service android:name=".MyIntentService"></service>
+        <service android:name=".LongRunningService" >
+        </service>
+        <receiver android:name=".AlarmReceiver" >
+        </receiver>
     </application>
 
 </manifest>
