@@ -26,6 +26,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,63 +34,53 @@ import java.io.IOException;
 
 public class MainActivity extends Activity implements View.OnClickListener{
     public static final String TAG = "MainActivity";
+    private VideoView videoView;
     private Button play;
     private Button pause;
-    private Button stop;
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private Button replay;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         play = (Button) findViewById(R.id.play);
         pause = (Button) findViewById(R.id.pause);
-        stop = (Button) findViewById(R.id.stop);
+        replay = (Button) findViewById(R.id.replay);
+        videoView = (VideoView) findViewById(R.id.video_view);
         play.setOnClickListener(this);
         pause.setOnClickListener(this);
-        stop.setOnClickListener(this);
-        // 初始化MediaPlayer
-        initMediaPlayer();
+        replay.setOnClickListener(this);
+        initVideoPath();
     }
 
-    private void initMediaPlayer() {
-        try {
-            File file = new File(Environment.getExternalStorageDirectory(), "nrhy.mp3");
-            Log.d(TAG,file.getPath());
-            mediaPlayer.setDataSource(file.getPath()); // 指定音频文件的路径
-            mediaPlayer.prepare(); // 让MediaPlayer进入到准备状态
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void initVideoPath() {
+        File file = new File(Environment.getExternalStorageDirectory(), "hzw743.3gp");
+        videoView.setVideoPath(file.getPath()); // 指定视频文件的路径
     }
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.play:
-                if (!mediaPlayer.isPlaying()) {
-                    mediaPlayer.start(); // 开始播放
+                if (!videoView.isPlaying()) {
+                    videoView.start(); // 开始播放
                 }
                 break;
             case R.id.pause:
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause(); // 暂停播放
+                if (videoView.isPlaying()) {
+                    videoView.pause(); // 暂时播放
                 }
                 break;
-            case R.id.stop:
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.reset(); // 停止播放
-                    initMediaPlayer();
+            case R.id.replay:
+                if (videoView.isPlaying()) {
+                    videoView.resume(); // 重新播放
                 }
-                break;
-            default:
                 break;
         }
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
+        if (videoView != null) {
+            videoView.suspend();//释放资源。
         }
     }
 
