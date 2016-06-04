@@ -1,7 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.test.www.test">
+
+    <!-- 定位权限 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
     <!-- 应用图标 ic_launcher -->
     <!-- 应用名称 app_name -->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
