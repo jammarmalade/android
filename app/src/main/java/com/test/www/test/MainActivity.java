@@ -13,12 +13,17 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xmlpull.v1.XmlPullParser;
@@ -31,6 +36,7 @@ import java.io.StringReader;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -83,8 +89,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         //Pull 解析
 //                        parseXMLWithPull(response);
                         //SAX 解析
-                        parseXMLWithSAX(response);
+//                        parseXMLWithSAX(response);
+                        //JSONObject 解析 JSON
+//                        parseJSONWithJSONObject(response);
+                        //google Gson 解析 JSON
+                        parseJSONWithGSON(response);
                     }
+                    
                 }catch (Exception e){
                     e.printStackTrace();
                 }finally {
@@ -93,6 +104,33 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
 
         }).start();
+    }
+
+    private void parseJSONWithGSON(String response) {
+        Gson gson = new Gson();
+        List<App> appList = gson.fromJson(response, new TypeToken<List<App>>() {}.getType());
+        for (App app : appList) {
+            Log.d(TAG, "id is " + app.getId());
+            Log.d(TAG, "name is " + app.getName());
+            Log.d(TAG, "version is " + app.getVersion());
+        }
+    }
+
+    private void parseJSONWithJSONObject(String jsonData) {
+        try {
+            JSONArray jsonArray = new JSONArray(jsonData);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String id = jsonObject.getString("id");
+                String name = jsonObject.getString("name");
+                String version = jsonObject.getString("version");
+                Log.d(TAG, "id is " + id);
+                Log.d(TAG, "name is " + name);
+                Log.d(TAG, "version is " + version);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendRequestWithHttpURLConnection() {
