@@ -69,7 +69,27 @@ public class MainActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         if (v.getId() == R.id.send_request) {
 //            sendRequestWithHttpURLConnection();
-            sendRequestWithHttpClient();
+//            sendRequestWithHttpClient();
+
+            //使用通用的 http 请求类
+            HttpUtil.sendHttpRequest("http://192.168.1.46/xx.php", new HttpCallbackListener() {
+                @Override
+                public void onFinish(String response) {
+                    // 在这里根据返回内容执行具体的逻辑，但不可以执行更新 UI（在子线程中，通过异步消息机制解决）
+
+                    /** 异步消息机制
+                     Message message = new Message();
+                     message.what = SHOW_RESPONSE;
+                     message.obj = response.toString();
+                     handler.sendMessage(message);
+                     */
+                    parseJSONWithGSON(response);
+                }
+                @Override
+                public void onError(Exception e) {
+                    // 在这里对异常情况进行处理，但不可以执行更新 UI（在子线程中，通过异步消息机制解决）
+                }
+            });
         }
     }
 
