@@ -2,8 +2,8 @@
     package="com.test.www.test">
 
     <!-- 定位权限 -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- 应用图标 ic_launcher -->
     <!-- 应用名称 app_name -->
 
