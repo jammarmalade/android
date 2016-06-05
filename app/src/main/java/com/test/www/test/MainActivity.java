@@ -8,21 +8,31 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
     public static final String TAG = "MainActivity";
     private SensorManager sensorManager;
+    private ImageView compassImg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        compassImg = (ImageView) findViewById(R.id.compass_img);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        //地磁传感器
+        Sensor magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        //加速传感器
+        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(listener, magneticSensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(listener, accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
     }
     @Override
     protected void onDestroy() {
@@ -32,15 +42,31 @@ public class MainActivity extends Activity {
         }
     }
     private SensorEventListener listener = new SensorEventListener() {
+        float[] accelerometerValues = new float[3];
+        float[] magneticValues = new float[3];
+        private float lastRotateDegree;
         @Override
         public void onSensorChanged(SensorEvent event) {
-            // 加速度可能会是负值，所以要取它们的绝对值
-            float xValue = Math.abs(event.values[0]);
-            float yValue = Math.abs(event.values[1]);
-            float zValue = Math.abs(event.values[2]);
-            if (xValue > 15 || yValue > 15 || zValue > 15) {
-                // 认为用户摇动了手机，触发摇一摇逻辑
-                Toast.makeText(MainActivity.this, "摇一摇", Toast.LENGTH_SHORT).show();
+            // 判断当前是加速度传感器还是地磁传感器
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                // 注意赋值时要调用clone()方法
+                accelerometerValues = event.values.clone();
+            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                // 注意赋值时要调用clone()方法
+                magneticValues = event.values.clone();
+            }
+            float[] values = new float[3];
+            float[] R = new float[9];
+            SensorManager.getRotationMatrix(R, null, accelerometerValues, magneticValues);
+            SensorManager.getOrientation(R, values);
+            //  将计算出的旋转角度取反，用于旋转指南针背景图
+            float rotateDegree = -(float) Math.toDegrees(values[0]);
+            if (Math.abs(rotateDegree - lastRotateDegree) > 1) {
+                RotateAnimation animation = new RotateAnimation(lastRotateDegree, rotateDegree, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                animation.setFillAfter(true);
+                //调用 ImageView 的 startAnimation ()方法来执行旋转动画
+                compassImg.startAnimation(animation);
+                lastRotateDegree = rotateDegree;
             }
         }
         @Override
