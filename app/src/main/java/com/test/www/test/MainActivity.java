@@ -10,29 +10,18 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Window;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     public static final String TAG = "MainActivity";
     private SensorManager sensorManager;
-    private TextView lightLevel;
-    private SensorEventListener listener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            // values数组中第一个下标的值就是当前的光照强度
-            float value = event.values[0];
-            lightLevel.setText("Current light level is " + value + " lx");
-        }
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        lightLevel = (TextView) findViewById(R.id.light_level);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
     @Override
@@ -42,5 +31,20 @@ public class MainActivity extends Activity {
             sensorManager.unregisterListener(listener);
         }
     }
-
+    private SensorEventListener listener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            // 加速度可能会是负值，所以要取它们的绝对值
+            float xValue = Math.abs(event.values[0]);
+            float yValue = Math.abs(event.values[1]);
+            float zValue = Math.abs(event.values[2]);
+            if (xValue > 15 || yValue > 15 || zValue > 15) {
+                // 认为用户摇动了手机，触发摇一摇逻辑
+                Toast.makeText(MainActivity.this, "摇一摇", Toast.LENGTH_SHORT).show();
+            }
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
 }
