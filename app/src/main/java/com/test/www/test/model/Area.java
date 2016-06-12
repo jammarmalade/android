@@ -9,6 +9,7 @@ public class Area {
     private String name;
     private String code;
     private String alias;
+    private int level;
     private int upid;
 
     public int getId() {
@@ -40,5 +41,11 @@ public class Area {
     }
     public void setUpid(int upid) {
         this.upid = upid;
+    }
+    public int getLevel(){
+        return level;
+    }
+    public void setLevel(int level){
+        this.level = level;
     }
 }

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">工具箱</string>
-    <string name="test">哈哈哈哈，测试一下</string>
+    <string name="refresh_weather">刷新</string>
+    <string name="switch_city">选择</string>
 </resources>

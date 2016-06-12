@@ -1,6 +1,7 @@
 package com.test.www.test.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -17,8 +18,10 @@ import org.json.JSONObject;
  */
 public class BaseActivity extends Activity {
     public static final String TAG = "BaseActivity";
+    private ProgressDialog progressDialog;
 
-    public static final String REQUEST_HOST = "http://192.168.1.46";
+//    public static final String REQUEST_HOST = "http://192.168.1.46";//家
+    public static final String REQUEST_HOST = "http://192.168.1.10";//公司
 
     @Override
     protected void onCreate(Bundle sis){
@@ -38,5 +41,21 @@ public class BaseActivity extends Activity {
         ActivityCollector.removeActivity(this);
     }
 
+    //显示对话框
+    public void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("正在加载...");
+            //点击屏幕其它地方是否会消失
+            progressDialog.setCanceledOnTouchOutside(false);
+        }
+        progressDialog.show();
+    }
 
+    //关闭对话框
+    public void closeProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
 }

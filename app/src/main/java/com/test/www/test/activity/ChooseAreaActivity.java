@@ -1,9 +1,10 @@
 package com.test.www.test.activity;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -12,11 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.test.www.test.R;
 import com.test.www.test.model.Area;
 import com.test.www.test.model.BaseApplication;
@@ -24,7 +21,6 @@ import com.test.www.test.util.CacheUtil;
 import com.test.www.test.util.HttpCallbackListener;
 import com.test.www.test.util.HttpUtil;
 import com.test.www.test.util.LogUtil;
-import com.test.www.test.util.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,7 +39,7 @@ public class ChooseAreaActivity extends BaseActivity {
     public static final int LEVEL_CITY = 2;
     public static final int LEVEL_COUNTY = 3;
 
-    private ProgressDialog progressDialog;
+
     private TextView titleText;
     private ListView listView;
     private ArrayAdapter<String> adapter;
@@ -61,10 +57,21 @@ public class ChooseAreaActivity extends BaseActivity {
 
     private Gson gson = new Gson();
 
+    private String from;
     @Override
     protected void onCreate(Bundle sis) {
         super.onCreate(sis);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        from = getIntent().getStringExtra("from");
+        //判断是否选择过城市，选择过就直接跳到显示天气的活动中
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //选择过城市，并且不是从 天气活动中跳转过来的
+        if (prefs.getBoolean("city_selected", false) && from==null) {
+            Intent intent = new Intent(this, WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.choose_area);
         listView = (ListView) findViewById(R.id.list_view);
         titleText = (TextView) findViewById(R.id.title_text);
@@ -73,14 +80,40 @@ public class ChooseAreaActivity extends BaseActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //若有地区天气代号，就跳向天气活动中
+                String weatherCode = "0";
+                int level = 1;
+
                 //若当前级别是省级，加载城市数据
                 if (currentLevel == LEVEL_PROVINCE) {
                     selectedProvince = provinceList.get(position);
-                    getCities();
+                    weatherCode = provinceList.get(position).getCode();
+                    level = 1;
                 } else if (currentLevel == LEVEL_CITY) {
                     //若是市级 ，加载县/区数据
                     selectedCity = cityList.get(position);
-                    getCunties();
+                    weatherCode = cityList.get(position).getCode();
+                    level = 2;
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    weatherCode = countyList.get(position).getCode();
+                    level = 3;
+                }
+
+                if(weatherCode.equals("0")){
+                    if(level == 3){
+                        Toast.makeText(ChooseAreaActivity.this, "当前城市没有天气信息", Toast.LENGTH_SHORT).show();
+                    }else{
+                        if (currentLevel == LEVEL_PROVINCE) {
+                            getCities();
+                        } else if (currentLevel == LEVEL_CITY) {
+                            getCunties();
+                        }
+                    }
+                }else{
+                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("weather_code", weatherCode);//区县的天气代号传过去
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -90,23 +123,11 @@ public class ChooseAreaActivity extends BaseActivity {
 
     //获取所有省级数据
     private void getProvinces() {
-        List cacheData = CacheUtil.readJson(BaseApplication.getContext() , "province");
-
-        try{
-            JSONArray tmpProvinceList = new JSONArray(cacheData.get(0).toString());
-            for(int i=0;i <tmpProvinceList.length();i++){
-                JSONObject province = tmpProvinceList.getJSONObject(i);
-                Area area = new Area();
-                area.setId(province.getInt("id"));
-                area.setName(province.getString("name"));
-                area.setAlias(province.getString("alias"));
-                area.setCode(province.getString("code"));
-                area.setUpid(province.getInt("upid"));
-                provinceList.add(area);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+        List cacheData = CacheUtil.readJson(BaseApplication.getContext() , "province",10);
+        if(cacheData.size()!=0){
+            provinceList = parseCacheData(cacheData);
         }
+
         if(provinceList.size() > 0){
             dataList.clear();
             for(Area province : provinceList){
@@ -117,27 +138,82 @@ public class ChooseAreaActivity extends BaseActivity {
             titleText.setText("中国");
             currentLevel = LEVEL_PROVINCE;
         }else{
-            sendRequest("", "province");
+            sendRequest(0, "province");
         }
     }
 
     //获取所有市级数据
     private void getCities() {
+        cityList.clear();
+        String fileName = "city-"+selectedProvince.getId();
+        List cacheData = CacheUtil.readJson(BaseApplication.getContext() ,fileName ,10);
+        if(cacheData.size()!=0){
+            cityList = parseCacheData(cacheData);
+        }
 
+        if(cityList.size() > 0){
+            dataList.clear();
+            for(Area city : cityList){
+                dataList.add(city.getName());
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            titleText.setText(selectedProvince.getName());
+            currentLevel = LEVEL_CITY;
+        }else{
+            sendRequest(selectedProvince.getId(), "city");
+        }
     }
 
     //获取所有区县级数据
     private void getCunties() {
-
+        countyList.clear();
+        String fileName = "area-"+selectedCity.getId();
+        List cacheData = CacheUtil.readJson(BaseApplication.getContext() ,fileName ,10);
+        if(cacheData.size()!=0){
+            countyList = parseCacheData(cacheData);
+        }
+        if(countyList.size() > 0){
+            dataList.clear();
+            for(Area county : countyList){
+                dataList.add(county.getName());
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            titleText.setText(selectedCity.getName());
+            currentLevel = LEVEL_COUNTY;
+        }else{
+            sendRequest(selectedCity.getId(), "area");
+        }
     }
-
-    private void sendRequest(final String code, final String type) {
+    //解析缓存的数据
+    private List<Area> parseCacheData(List cacheData){
+        List<Area> tmpList = new ArrayList<>();
+        try{
+            JSONArray tmpProvinceList = new JSONArray(cacheData.get(0).toString());
+            for(int i=0;i <tmpProvinceList.length();i++){
+                JSONObject province = tmpProvinceList.getJSONObject(i);
+                Area area = new Area();
+                area.setId(province.getInt("id"));
+                area.setName(province.getString("name"));
+                area.setAlias(province.getString("alias"));
+                area.setCode(province.getString("code"));
+                area.setUpid(province.getInt("upid"));
+                area.setLevel(province.getInt("level"));
+                tmpList.add(area);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return tmpList;
+    }
+    private void sendRequest(final int code, final String type) {
         String url = "";
-        if (type == "province") {
+        if (type.equals("province")) {
             url = RESQUEST_URL + "/province";
-        } else if (type == "city") {
+        } else if (type.equals("city")) {
             url = RESQUEST_URL + "/city/" + code;
-        } else if (type == "area") {
+        } else if (type.equals("area")) {
             url = RESQUEST_URL + "/area/" + code;
         }
         if (url.equals("")) {
@@ -148,6 +224,7 @@ public class ChooseAreaActivity extends BaseActivity {
             @Override
             public void onFinish(String response) {
                 Object res = parseResult(response);
+
                 if (res.equals("")) {
                     closeProgressDialog();
                     Toast.makeText(ChooseAreaActivity.this, "解析数据失败", Toast.LENGTH_SHORT).show();
@@ -164,19 +241,19 @@ public class ChooseAreaActivity extends BaseActivity {
                 CacheUtil.writeJson(BaseApplication.getContext(), cacheData, cacheName, false);
 
                 //通过 runOnUiThread() 方法回到主线程处理逻辑
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        closeProgressDialog();
-//                        if ("province".equals(type)) {
-//                            getProvinces();
-//                        } else if ("city".equals(type)) {
-//                            getCities();
-//                        } else if ("area".equals(type)) {
-//                            getCunties();
-//                        }
-//                    }
-//                });
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        closeProgressDialog();
+                        if ("province".equals(type)) {
+                            getProvinces();
+                        } else if ("city".equals(type)) {
+                            getCities();
+                        } else if ("area".equals(type)) {
+                            getCunties();
+                        }
+                    }
+                });
 
             }
 
@@ -193,23 +270,7 @@ public class ChooseAreaActivity extends BaseActivity {
         });
     }
 
-    //显示对话框
-    private void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("正在加载...");
-            //点击屏幕其它地方是否会消失
-            progressDialog.setCanceledOnTouchOutside(false);
-        }
-        progressDialog.show();
-    }
 
-    //关闭对话框
-    private void closeProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-    }
 
     /**
      * 捕获Back按键，根据当前的级别来判断，此时应该返回市列表、省列表、还是直接退出。
@@ -221,6 +282,11 @@ public class ChooseAreaActivity extends BaseActivity {
         } else if (currentLevel == LEVEL_CITY) {
             getProvinces();
         } else {
+            //若是从天气活动中跳转来的，就跳回天气活动
+            if (from.equals("weather")) {
+                Intent intent = new Intent(this, WeatherActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
@@ -236,6 +302,7 @@ public class ChooseAreaActivity extends BaseActivity {
                 return "";
             }
             JSONArray result = jsonObject.getJSONArray("result");
+            areaList.clear();
             for (int i = 0; i < result.length(); i++) {
                 JSONObject areaTmp = (JSONObject) result.opt(i);
                 Area area = new Area();
@@ -244,6 +311,7 @@ public class ChooseAreaActivity extends BaseActivity {
                 area.setAlias(areaTmp.getString("alias"));
                 area.setCode(areaTmp.getString("zh_code"));
                 area.setUpid(areaTmp.getInt("upid"));
+                area.setLevel(areaTmp.getInt("level"));
                 areaList.add(area);
             }
             return areaList;
@@ -252,4 +320,5 @@ public class ChooseAreaActivity extends BaseActivity {
         }
         return "";
     }
+
 }
