@@ -6,5 +6,5 @@ package com.test.www.test.util;
  */
 public interface HttpCallbackListener {
     void onFinish(String response);
-    void onError(Exception e);
+    void onError(String msg,Exception e);
 }

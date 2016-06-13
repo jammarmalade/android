@@ -3,14 +3,8 @@ package com.test.www.test.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.test.www.test.model.ActivityCollector;
-import com.test.www.test.model.BaseApplication;
-import com.test.www.test.util.LogUtil;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Created by Administrator on 2016/6/11.
@@ -33,6 +27,7 @@ public class BaseActivity extends Activity {
 //        LogUtil.d(TAG, getClass().getSimpleName());
 
     }
+
 
     @Override
     protected void onDestroy() {

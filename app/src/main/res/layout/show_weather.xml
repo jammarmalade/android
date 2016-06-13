@@ -32,6 +32,7 @@
             android:background="#c1c1c1"
             android:text="@string/refresh_weather"/>
     </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -47,20 +48,22 @@
             android:layout_marginTop="10dp"
             android:textSize="18sp"
             android:textColor="#fff"/>
-        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/current_date"
+            android:gravity="center"
+            android:textColor="#fff"
+            android:textSize="18sp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/weather_info_layout"
-            android:layout_centerInParent="true"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:id="@+id/current_date"
-                android:gravity="center"
-                android:textColor="#fff"
-                android:textSize="18sp"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -94,12 +97,46 @@
             </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
+                android:layout_height="40dp"
                 android:id="@+id/weather_desp"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
                 android:textSize="20sp"
-                android:textColor="#fff"/>
+                android:textColor="#fff"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"/>
+
         </LinearLayout>
+        <!-- 未来几天天气 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="未来几天天气"
+            android:layout_marginTop="160dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"/>
+        <ListView
+            android:id="@+id/forecast_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="180dp"
+            android:dividerHeight="10dp">
+        </ListView>
+        <!-- 今日指数 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="指数信息"
+            android:layout_marginTop="320dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"/>
+        <ListView
+            android:id="@+id/zhishu_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="340dp"
+            android:dividerHeight="10dp">
+
+        </ListView>
     </RelativeLayout>
-</LinearLayout>
+</LinearLayout >

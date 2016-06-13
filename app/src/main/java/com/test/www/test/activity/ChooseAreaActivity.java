@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -123,9 +124,10 @@ public class ChooseAreaActivity extends BaseActivity {
 
     //获取所有省级数据
     private void getProvinces() {
-        List cacheData = CacheUtil.readJson(BaseApplication.getContext() , "province",10);
+        List cacheData = CacheUtil.readJson(BaseApplication.getContext() , "province",3600);
         if(cacheData.size()!=0){
-            provinceList = parseCacheData(cacheData);
+            String jsonData = cacheData.get(0).toString();
+            provinceList = parseCacheData(jsonData);
         }
 
         if(provinceList.size() > 0){
@@ -146,9 +148,11 @@ public class ChooseAreaActivity extends BaseActivity {
     private void getCities() {
         cityList.clear();
         String fileName = "city-"+selectedProvince.getId();
-        List cacheData = CacheUtil.readJson(BaseApplication.getContext() ,fileName ,10);
+        List cacheData = CacheUtil.readJson(BaseApplication.getContext() ,fileName ,3600);
+        String jsonData ="";
         if(cacheData.size()!=0){
-            cityList = parseCacheData(cacheData);
+            jsonData = cacheData.get(0).toString();
+            cityList = parseCacheData(jsonData);
         }
 
         if(cityList.size() > 0){
@@ -160,6 +164,8 @@ public class ChooseAreaActivity extends BaseActivity {
             listView.setSelection(0);
             titleText.setText(selectedProvince.getName());
             currentLevel = LEVEL_CITY;
+        }else if(jsonData.equals("\"empty\"")){
+            Toast.makeText(BaseApplication.getContext(), "没有下级数据", Toast.LENGTH_SHORT).show();
         }else{
             sendRequest(selectedProvince.getId(), "city");
         }
@@ -169,9 +175,11 @@ public class ChooseAreaActivity extends BaseActivity {
     private void getCunties() {
         countyList.clear();
         String fileName = "area-"+selectedCity.getId();
-        List cacheData = CacheUtil.readJson(BaseApplication.getContext() ,fileName ,10);
+        List cacheData = CacheUtil.readJson(BaseApplication.getContext() ,fileName ,3600);
+        String jsonData ="";
         if(cacheData.size()!=0){
-            countyList = parseCacheData(cacheData);
+            jsonData = cacheData.get(0).toString();
+            countyList = parseCacheData(jsonData);
         }
         if(countyList.size() > 0){
             dataList.clear();
@@ -182,15 +190,17 @@ public class ChooseAreaActivity extends BaseActivity {
             listView.setSelection(0);
             titleText.setText(selectedCity.getName());
             currentLevel = LEVEL_COUNTY;
+        }else if(jsonData.equals("\"empty\"")){
+            Toast.makeText(BaseApplication.getContext(), "没有下级数据", Toast.LENGTH_SHORT).show();
         }else{
             sendRequest(selectedCity.getId(), "area");
         }
     }
     //解析缓存的数据
-    private List<Area> parseCacheData(List cacheData){
+    private List<Area> parseCacheData(String cacheData){
         List<Area> tmpList = new ArrayList<>();
         try{
-            JSONArray tmpProvinceList = new JSONArray(cacheData.get(0).toString());
+            JSONArray tmpProvinceList = new JSONArray(cacheData);
             for(int i=0;i <tmpProvinceList.length();i++){
                 JSONObject province = tmpProvinceList.getJSONObject(i);
                 Area area = new Area();
@@ -225,10 +235,6 @@ public class ChooseAreaActivity extends BaseActivity {
             public void onFinish(String response) {
                 Object res = parseResult(response);
 
-                if (res.equals("")) {
-                    closeProgressDialog();
-                    Toast.makeText(ChooseAreaActivity.this, "解析数据失败", Toast.LENGTH_SHORT).show();
-                }
                 String cacheName = type;
                 if ("province".equals(type)) {
                     cacheName = type;
@@ -236,6 +242,13 @@ public class ChooseAreaActivity extends BaseActivity {
                     cacheName = type + "-" + code;
                 } else if ("area".equals(type)) {
                     cacheName = type + "-" + code;
+                }
+                if (res.equals("")) {
+                    onError("解析数据失败",new Exception());
+                }else if(res.equals("empty")){
+                    onError("",new Exception());
+                    //存一份空数据 empty
+                    CacheUtil.writeJson(BaseApplication.getContext(), res.toString(),cacheName , false);
                 }
                 String cacheData = gson.toJson(res);
                 CacheUtil.writeJson(BaseApplication.getContext(), cacheData, cacheName, false);
@@ -258,14 +271,16 @@ public class ChooseAreaActivity extends BaseActivity {
             }
 
             @Override
-            public void onError(Exception e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeProgressDialog();
-                        Toast.makeText(ChooseAreaActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void onError(final String msg,Exception e) {
+                if(!msg.equals("")){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            closeProgressDialog();
+                            Toast.makeText(ChooseAreaActivity.this,msg , Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }
@@ -302,6 +317,9 @@ public class ChooseAreaActivity extends BaseActivity {
                 return "";
             }
             JSONArray result = jsonObject.getJSONArray("result");
+            if(result.length()==0){
+                return "empty";
+            }
             areaList.clear();
             for (int i = 0; i < result.length(); i++) {
                 JSONObject areaTmp = (JSONObject) result.opt(i);

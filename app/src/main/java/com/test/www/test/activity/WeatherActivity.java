@@ -9,12 +9,18 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.test.www.test.R;
 import com.test.www.test.model.Area;
 import com.test.www.test.model.BaseApplication;
+import com.test.www.test.model.ForecastAdapter;
+import com.test.www.test.model.Index;
+import com.test.www.test.model.IndexAdapter;
+import com.test.www.test.model.Weather;
 import com.test.www.test.util.CacheUtil;
 import com.test.www.test.util.HttpCallbackListener;
 import com.test.www.test.util.HttpUtil;
@@ -24,6 +30,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -106,8 +114,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
                 String res = parseResult(response);
 
                 if (res.equals("")) {
-                    closeProgressDialog();
-                    Toast.makeText(WeatherActivity.this, "解析数据失败", Toast.LENGTH_SHORT).show();
+                    onError("解析数据失败",new Exception());
                 }else{
                     //存储数据
                     saveWeatherData(res);
@@ -125,12 +132,12 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
             }
 
             @Override
-            public void onError(Exception e) {
+            public void onError(final String msg,Exception e) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         closeProgressDialog();
-                        Toast.makeText(WeatherActivity.this, "获取失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WeatherActivity.this, msg, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -144,7 +151,8 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
             //环境信息（区县没有）
             String weatherDesp = "无";
             if(weatherInfo.isNull("environment")){
-
+                //没有就显示风向
+                weatherDesp = weatherInfo.getString("fengxiang");
             }else{
                 JSONObject environment = weatherInfo.getJSONObject("environment");
                 weatherDesp = environment.getString("suggest");
@@ -155,13 +163,16 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
             //未来几天的信息
             JSONObject forecast = weatherInfo.getJSONObject("forecast");
             JSONArray weatherList = forecast.getJSONArray("weather");
+            //指数
+            JSONObject zhishus = weatherInfo.getJSONObject("zhishus");
+            JSONArray zhishu = zhishus.getJSONArray("zhishu");
             //今天的最低温度和最高温度
             String tempLow,tempUp;
             JSONObject tmpDay = weatherList.getJSONObject(0);
             tempUp = tmpDay.getString("high").split(" ")[1];
             tempLow = tmpDay.getString("low").split(" ")[1];
 //            for(int i=0;i<weatherList.length();i++) {
-
+//
 //            }
 
             //使用 SharedPreferences 保存数据
@@ -174,6 +185,8 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
             editor.putString("tempUp", tempUp);
             editor.putString("weather_desp", weatherDesp);
             editor.putString("publish_time", weatherInfo.getString("updatetime"));
+            editor.putString("weatherList", weatherList.toString());//未来几天天气
+            editor.putString("indexs", zhishu.toString());//各项指数
             editor.putString("current_date", sdf.format(System.currentTimeMillis()));
             editor.putLong("cache_time", System.currentTimeMillis());
             editor.commit();
@@ -204,14 +217,69 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
     private void showWeather(){
         //获取缓存信息并显示
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
-        cityNameText.setText( prefs.getString("city_name", ""));
-        temp1Text.setText(prefs.getString("tempLow", ""));
-        temp2Text.setText(prefs.getString("tempUp", ""));
-        weatherDespText.setText(prefs.getString("weather_desp", ""));
-        publishText.setText("今天" + prefs.getString("publish_time", "") + "发布");
-        currentDateText.setText(prefs.getString("current_date", ""));
-        weatherInfoLayout.setVisibility(View.VISIBLE);
-        cityNameText.setVisibility(View.VISIBLE);
+        //查看缓存时间
+        long cacheTime = prefs.getLong("cache_time",0);
+        int expireTime = 600 * 1000;//10分钟缓存
+        if((System.currentTimeMillis() - cacheTime) > expireTime){
+            queryWeatherInfo(prefs.getString("weather_code","0"));
+        }else{
+            cityNameText.setText(prefs.getString("city_name", ""));
+            temp1Text.setText(prefs.getString("tempLow", ""));
+            temp2Text.setText(prefs.getString("tempUp", ""));
+            weatherDespText.setText(prefs.getString("weather_desp", ""));
+            publishText.setText("今天" + prefs.getString("publish_time", "") + "发布");
+            currentDateText.setText(prefs.getString("current_date", ""));
+            weatherInfoLayout.setVisibility(View.VISIBLE);
+            cityNameText.setVisibility(View.VISIBLE);
+            //未来几天数据
+            String weatherListJson = prefs.getString("weatherList", "");
+            if(!weatherListJson.equals("")){
+                List<Weather> weatherList = new ArrayList<Weather>();
+                try{
+                    JSONArray weatherListArr = new JSONArray(weatherListJson);
+                    //今天就不显示
+                    for(int i=1;i <weatherListArr.length();i++) {
+                        JSONObject tmpWeather = (JSONObject) weatherListArr.opt(i);
+                        Weather weather = new Weather();
+                        weather.setDate(tmpWeather.getString("date"));
+                        weather.setTmpLow(tmpWeather.getString("low").split(" ")[1]);
+                        weather.setTmpHigh(tmpWeather.getString("high").split(" ")[1]);
+                        //天气类型
+                        JSONObject tmpDay = tmpWeather.getJSONObject("day");
+                        weather.setType(tmpDay.getString("type"));
+                        weatherList.add(weather);
+                    }
+
+                    ForecastAdapter adapter = new ForecastAdapter(WeatherActivity.this, R.layout.weather_item, weatherList);
+                    ListView listView = (ListView)findViewById(R.id.forecast_list);
+                    listView.setAdapter(adapter);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            //指数信息
+            String indexListJson = prefs.getString("indexs", "");
+            if(!indexListJson.equals("")){
+                List<Index> indexList = new ArrayList<>();
+                try{
+                    JSONArray indexListArr = new JSONArray(indexListJson);
+                    for(int i=0;i <indexListArr.length();i++) {
+                        JSONObject tmpIndex = (JSONObject) indexListArr.opt(i);
+                        Index index = new Index();
+                        index.setName(tmpIndex.getString("name"));
+                        index.setValue(tmpIndex.getString("value"));
+                        index.setDetail(tmpIndex.getString("detail"));
+                        indexList.add(index);
+                    }
+
+                    IndexAdapter adapter = new IndexAdapter(WeatherActivity.this, R.layout.index_item, indexList);
+                    ListView listView = (ListView)findViewById(R.id.zhishu_list);
+                    listView.setAdapter(adapter);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
