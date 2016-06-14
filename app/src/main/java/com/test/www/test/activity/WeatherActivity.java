@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +32,11 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -263,6 +267,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
                 List<Index> indexList = new ArrayList<>();
                 try{
                     JSONArray indexListArr = new JSONArray(indexListJson);
+                    /* 使用 自定义 adapter 布局
                     for(int i=0;i <indexListArr.length();i++) {
                         JSONObject tmpIndex = (JSONObject) indexListArr.opt(i);
                         Index index = new Index();
@@ -271,10 +276,25 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
                         index.setDetail(tmpIndex.getString("detail"));
                         indexList.add(index);
                     }
-
                     IndexAdapter adapter = new IndexAdapter(WeatherActivity.this, R.layout.index_item, indexList);
                     ListView listView = (ListView)findViewById(R.id.zhishu_list);
                     listView.setAdapter(adapter);
+                    */
+                    /* 使用 SimpleAdapter 布局 ListView */
+                    List<Map<String,Object>> listItems = new ArrayList<Map<String,Object>>();
+                    for(int i=0;i <indexListArr.length();i++) {
+                        JSONObject tmpIndex = (JSONObject) indexListArr.opt(i);
+                        Map<String , Object> listItem = new HashMap<>();
+                        listItem.put("name",tmpIndex.getString("name"));
+                        listItem.put("value",tmpIndex.getString("value"));
+                        listItem.put("detail",tmpIndex.getString("detail"));
+                        listItems.add(listItem);
+                    }
+                    SimpleAdapter simpleAdapter = new SimpleAdapter(this,listItems ,R.layout.index_item ,
+                            new String[]{"name" ,"value" , "detail"},//listItems 中对应的 key 值
+                            new int[]{ R.id.name, R.id.value, R.id.detail});//要显示的布局id，与上面的 String[] 一一对应
+                    ListView listView = (ListView)findViewById(R.id.zhishu_list);
+                    listView.setAdapter(simpleAdapter);
                 }catch (Exception e){
                     e.printStackTrace();
                 }

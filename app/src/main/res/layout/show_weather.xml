@@ -114,30 +114,34 @@
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:text="未来几天天气"
-            android:layout_marginTop="160dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/weather_info_layout"/>
         <ListView
             android:id="@+id/forecast_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="180dp"
-            android:dividerHeight="10dp">
+            android:layout_marginTop="40dp"
+            android:dividerHeight="10dp"
+            android:layout_below="@+id/weather_info_layout">
         </ListView>
         <!-- 今日指数 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:text="指数信息"
-            android:layout_marginTop="320dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/forecast_list"/>
         <ListView
             android:id="@+id/zhishu_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="340dp"
-            android:dividerHeight="10dp">
+            android:layout_marginTop="40dp"
+            android:dividerHeight="10dp"
+            android:layout_below="@+id/forecast_list">
 
         </ListView>
     </RelativeLayout>
