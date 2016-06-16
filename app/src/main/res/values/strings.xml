@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Jam test</string>
-    <string name="test">哈哈哈哈，测试一下</string>
+    <string name="toolbar_title">标题</string>
+    <string name="action_settings">settings</string>
+    <string name="open">打开</string>
+    <string name="close">关闭</string>
+    <string name="header_author_name">Jam</string>
+    <string name="header_author_url">jam00.com</string>
+    <string name="plusone">+1</string>
+    <string name="item_clicked">item clicked！</string>
+    <string name="item_longclicked">item long clicked！</string>
 </resources>
