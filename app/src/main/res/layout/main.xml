@@ -6,6 +6,10 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/test"
-        android:text="@string/test"/>
+        android:id="@+id/button"
+        android:text="下载"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/image"/>
 </LinearLayout>
