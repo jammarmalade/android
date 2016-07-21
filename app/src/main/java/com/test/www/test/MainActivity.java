@@ -1,44 +1,82 @@
 package com.test.www.test;
 
 
-import android.app.Activity;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
-public class MainActivity extends Activity {
-    public static final String TAG = "MainActivity";
+import com.jude.rollviewpager.RollPagerView;
+import com.jude.rollviewpager.adapter.StaticPagerAdapter;
+import com.jude.rollviewpager.hintview.ColorPointHintView;
 
-    private Button mButton;
-    private ImageView mImageView;
+public class MainActivity extends AppCompatActivity {
+
+    private RollPagerView mRollViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        mButton = (Button) findViewById(R.id.button);
-        mImageView= (ImageView) findViewById(R.id.image);
 
+        mRollViewPager = (RollPagerView) findViewById(R.id.roll_view_pager);
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        //设置播放时间间隔
+        mRollViewPager.setPlayDelay(1000);
+        //设置透明度
+        mRollViewPager.setAnimationDurtion(500);
+        //设置适配器
+        mRollViewPager.setAdapter(new TestNormalAdapter());
 
-            @Override
-            public void onClick(View v) {
-                String url = "http://www.weijingtong.com/upload/article/20160504/1462332392_543689.jpg_640x3200.jpg";
-                ImageCacheManager.loadImage(url, mImageView, getBitmapFromRes(R.mipmap.ic_launcher), getBitmapFromRes(R.mipmap.ic_launcher));
-            }
-        });
+        //设置指示器（顺序依次）
+        //自定义指示器图片
+        //设置圆点指示器颜色
+        //设置文字指示器
+        //隐藏指示器
+        //mRollViewPager.setHintView(new IconHintView(this, R.drawable.point_focus, R.drawable.point_normal));
+        mRollViewPager.setHintView(new ColorPointHintView(this, Color.YELLOW,Color.WHITE));
+        //mRollViewPager.setHintView(new TextHintView(this));
+        //mRollViewPager.setHintView(null);
     }
 
-    public Bitmap getBitmapFromRes(int resId) {
-        Resources res = this.getResources();
-        return BitmapFactory.decodeResource(res, resId);
+    private class TestNormalAdapter extends StaticPagerAdapter {
+        private int[] imgs = {
+                R.drawable.img1,
+                R.drawable.img2,
+                R.drawable.img3,
+                R.drawable.img4,
+        };
+
+
+        @Override
+        public View getView(ViewGroup container, int position) {
+            ImageView view = new ImageView(container.getContext());
+            view.setImageResource(imgs[position]);
+            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            return view;
+        }
+
+
+        @Override
+        public int getCount() {
+            return imgs.length;
+        }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
+    }
 }
