@@ -2,8 +2,8 @@
     <dbname value="weather" />
     <version value="1" />
     <list>
-        <mapping class="com.test.www.test.db.Provice"/>
-        <mapping class="com.test.www.test.db.City"/>
-        <mapping class="com.test.www.test.db.County"/>
+        <mapping class="com.jam00.www.db.Provice"/>
+        <mapping class="com.jam00.www.db.City"/>
+        <mapping class="com.jam00.www.db.County"/>
     </list>
 </litepal>

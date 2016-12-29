@@ -4,7 +4,7 @@
     android:id="@+id/activity_weather"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.test.www.test.activity.WeatherActivity"
+    tools:context="com.jam00.www.activity.WeatherActivity"
     android:background="@color/colorPrimary">
     <!--FrameLayout 默认情况下会将控件都放在左上角
     所以ScrollView会完全覆盖ImageView ,ImageView 就会成背景图-->
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/choose_area_fragment"
-            android:name="com.test.www.test.fragment.ChooseAreaFragment"
+            android:name="com.jam00.www.fragment.ChooseAreaFragment"
             tools:layout="@layout/_choose_area"
             android:layout_gravity="start"/>
     </android.support.v4.widget.DrawerLayout>
