@@ -11,6 +11,7 @@ public class City extends DataSupport{
     private String cityName;
     private int cityCode;
     private int provinceId;
+    private String weatherId;
     public int getId(){
         return id;
     }
@@ -34,5 +35,11 @@ public class City extends DataSupport{
     }
     public void setProvinceId(int provinceId){
         this.provinceId = provinceId;
+    }
+    public String getWeatherId(){
+        return weatherId;
+    }
+    public void setWeatherId(String weatherId){
+        this.weatherId = weatherId;
     }
 }

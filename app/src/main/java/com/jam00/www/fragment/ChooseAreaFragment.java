@@ -4,9 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import okhttp3.Call;
@@ -79,6 +82,11 @@ public class ChooseAreaFragment extends Fragment {
      */
     private int currentLevel;
 
+    /**
+     * 特殊城市
+     */
+    private ArrayList specialCity = new ArrayList();
+
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,6 +96,11 @@ public class ChooseAreaFragment extends Fragment {
         listView = (ListView)view.findViewById(R.id.list_view);
         adapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
+        //特殊城市
+        int[] s = {45052,45053,45054,45055,534,5025,516,517,518,519,520,521,522,523,524,526,525,527,528,529,530,531,532,533};
+        for(int i=0 ;i<s.length;i++){
+            specialCity.add(s[i]);
+        }
         return view;
     }
     @Override
@@ -96,22 +109,42 @@ public class ChooseAreaFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String weatherId = "0";
+                String countyName = "";
                 if(currentLevel == LEVEL_PROVINCE){
                     //获取城市
                     selectProvince = proviceList.get(i);
                     queryCities();
                 }else if(currentLevel == LEVEL_CITY){
-                    //获取县
-                    selectCity = cityList.get(i);
-                    queryCounties();
+                    if(specialCity.contains(cityList.get(i).getCityCode())){
+                        weatherId = cityList.get(i).getWeatherId();
+                        //若天气代号等于0，则用上级的天气代号
+                        if("0".equals(weatherId)){
+                            weatherId = selectProvince.getWeatherId();
+                        }
+                        countyName = cityList.get(i).getCityName();
+                    }else{
+                        //获取县
+                        selectCity = cityList.get(i);
+                        queryCounties();
+                    }
                 }else if(currentLevel == LEVEL_COUNTY){
-                    String weatherId = countyList.get(i).getWeatherId();
+                    weatherId = countyList.get(i).getWeatherId();
+                    //若天气代号等于0，则用上级的天气代号
+                    if("0".equals(weatherId)){
+                        weatherId = selectCity.getWeatherId();
+                    }
+                    countyName = countyList.get(i).getCountyName();
+                }
+                //若是有天气id就执行获取天气
+                if(!"0".equals(weatherId)){
+                    //保存城市名称，用于显示
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                    editor.putString("countyName",countyName);
+                    editor.apply();
                     //区分当前碎片(fragment)是在 MainActivity 还是 WeatherActivity 中的
                     if(getActivity() instanceof ChooseAreaActivity){
                         //在 MainActivity 中打开的，跳转到 WeatherActivity
-//                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
-//                        intent.putExtra("weather_id", weatherId);
-//                        startActivity(intent);
                         WeatherActivity.actionStart(getActivity() ,weatherId);
                         getActivity().finish();
                     }else if(getActivity() instanceof WeatherActivity){
@@ -124,7 +157,6 @@ public class ChooseAreaFragment extends Fragment {
                         //调用 requestWeather 获取数据
                         activity.requestWeather(weatherId);
                     }
-
                 }
             }
         });
@@ -157,7 +189,7 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
         }else{
-            String address = BaseActivity.REQUEST_HOST+"china";
+            String address = BaseActivity.REQUEST_HOST+"/weather/province";
             queryFromServer(address, "province");
         }
     }
@@ -167,7 +199,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCities(){
         titleText.setText(selectProvince.getProviceName());
         backButton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("provinceid = ?", String.valueOf(selectProvince.getId())).find(City.class);
+        cityList = DataSupport.where("provinceId = ?", String.valueOf(selectProvince.getProviceCode())).find(City.class);
         if(cityList.size() > 0){
             dataList.clear();
             for(City city : cityList){
@@ -178,7 +210,7 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else{
             int provinceCode = selectProvince.getProviceCode();
-            String address = BaseActivity.REQUEST_HOST+"china/"+provinceCode;
+            String address = BaseActivity.REQUEST_HOST+"/weather/city/"+provinceCode;
             queryFromServer(address, "city");
         }
     }/**
@@ -187,7 +219,8 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCounties(){
         titleText.setText(selectCity.getCityName());
         backButton.setVisibility(View.VISIBLE);
-        countyList = DataSupport.where("cityid = ?",String.valueOf(selectCity.getId())).find(County.class);
+        countyList = DataSupport.where("cityId = ?",String.valueOf(selectCity.getCityCode())).find(County.class);
+
         if(countyList.size() > 0){
             dataList.clear();
             for(County county : countyList){
@@ -197,9 +230,9 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel = LEVEL_COUNTY;
         }else{
-            int provinceCode = selectProvince.getProviceCode();
+//            int provinceCode = selectProvince.getProviceCode();
             int cityCode = selectCity.getCityCode();
-            String address = BaseActivity.REQUEST_HOST+"china/"+provinceCode+"/"+cityCode;
+            String address = BaseActivity.REQUEST_HOST+"/weather/area/"+cityCode;
             queryFromServer(address, "county");
         }
     }
@@ -229,9 +262,9 @@ public class ChooseAreaFragment extends Fragment {
                 if("province".equals(type)){
                     result = Utility.handleProvinceResponse(responseText);
                 }else if("city".equals(type)){
-                    result = Utility.handleCityResponse(responseText ,selectProvince.getId());
+                    result = Utility.handleCityResponse(responseText ,selectProvince.getProviceCode());
                 }else if("county".equals(type)){
-                    result = Utility.handleCountyResponse(responseText ,selectCity.getId());
+                    result = Utility.handleCountyResponse(responseText ,selectCity.getCityCode());
                 }
 
                 if (result) {

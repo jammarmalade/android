@@ -178,7 +178,7 @@ public class WeatherActivity extends BaseActivity {
      * 根据天气id 获取城市天气信息
      */
     public void requestWeather(final String weatherId){
-        final String weatehrUrl = REQUEST_HOST+"weather?cityid="+weatherId+"&key="+AUTH_KEY;
+        final String weatehrUrl = REQUEST_HOST+"/weather/weather/"+weatherId;
         HttpUtil.sendOkHttpRequest(weatehrUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -221,7 +221,9 @@ public class WeatherActivity extends BaseActivity {
      */
     public void showWeatherInfo(Weather weather){
         if(weather!=null && "ok".equals(weather.status)){
-            String cityName = weather.basic.cityName;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String cityName = prefs.getString("countyName",null);
+//            String cityName = weather.basic.cityName;
             String updateTime = weather.basic.update.updateTime.split(" ")[1];
             String degree = weather.now.temperature+"℃";
             String weatherInfo = weather.now.more.info;

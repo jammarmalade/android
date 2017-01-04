@@ -10,6 +10,7 @@ public class Provice extends DataSupport{
     private int id;
     private String proviceName;
     private int proviceCode;
+    private String weatherId;
     public int getId(){
         return id;
     }
@@ -27,5 +28,11 @@ public class Provice extends DataSupport{
     }
     public void setProviceCode(int proviceCode){
         this.proviceCode = proviceCode;
+    }
+    public String getWeatherId(){
+        return weatherId;
+    }
+    public void setWeatherId(String weatherId){
+        this.weatherId = weatherId;
     }
 }

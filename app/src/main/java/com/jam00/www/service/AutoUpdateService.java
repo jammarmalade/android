@@ -56,7 +56,7 @@ public class AutoUpdateService extends Service {
         updateWeather();
         updateBingPic();
         //获取定位信息
-        getLocation();
+//        getLocation();
         LogUtil.d(TAG, "exe - "+Utility.getNowTime());
         //创建定时任务
         AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);

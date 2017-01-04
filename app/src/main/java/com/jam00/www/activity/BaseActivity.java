@@ -13,7 +13,8 @@ public class BaseActivity extends AppCompatActivity {
     public static final String AUTH_KEY = "41b1c534a9284d5785e21ef1e3ac38fe";//获取天气的授权key
     private long mExitTime;
 
-    public static final String REQUEST_HOST = "http://guolin.tech/api/";//请求地址
+//    public static final String REQUEST_HOST = "http://guolin.tech/api/";//请求地址
+    public static final String REQUEST_HOST = "http://192.168.1.100/advanced/api/web/index.php/v1";//本地
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
