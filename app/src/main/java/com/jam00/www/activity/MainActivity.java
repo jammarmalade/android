@@ -21,7 +21,8 @@ public class MainActivity extends Activity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                ChooseAreaActivity.actionStart(MainActivity.this);
+//                ChooseAreaActivity.actionStart(MainActivity.this);
+                HomeActivity.actionStart(MainActivity.this);
                 //启动主Activity后销毁自身
                 finish();
             }

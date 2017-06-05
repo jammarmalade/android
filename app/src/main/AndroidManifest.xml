@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- 友盟推送权限 -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- 应用图标 ic_launcher -->
     <!-- 应用名称 app_name -->
@@ -32,28 +32,27 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="3Xv1UpHz9tIL7Mo5BnGOUx8VedSMgwXC" />
-        <!-- 设置友盟推送的  APPKEY 和 SECRET-->
+        <!-- 设置友盟推送的  APPKEY 和 SECRET -->
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="58637a57734be467d70013a4">
-        </meta-data>
+            android:value="58637a57734be467d70013a4"></meta-data>
         <meta-data
             android:name="UMENG_MESSAGE_SECRET"
-            android:value="203476d2f668f73d138036c32dc9522c">
-        </meta-data>
+            android:value="203476d2f668f73d138036c32dc9522c"></meta-data>
         <!-- 用Channel ID来标识App的推广渠道，作为推送消息时给用户分组的一个维度（可选） -->
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="jam00" >
-        </meta-data>
+            android:value="jam00"></meta-data>
         <!-- @android:style/Theme.NoTitleBar.Fullscreen  全屏显示 -->
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
+
                 <!-- 下面两句表示以  MainActivity 为主活动 （点击应用图标首先启动这个） -->
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -71,6 +70,10 @@
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
+
+        <activity
+            android:name=".activity.HomeActivity"
+            android:label="@string/title_activity_home"></activity>
     </application>
 
 </manifest>
