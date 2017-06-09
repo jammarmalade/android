@@ -43,19 +43,19 @@
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="jam00"></meta-data>
-        <!-- @android:style/Theme.NoTitleBar.Fullscreen  全屏显示 -->
+        <!-- android:theme="@android:style/Theme.NoTitleBar.Fullscreen"  全屏显示 -->
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            >
             <intent-filter>
-
                 <!-- 下面两句表示以  MainActivity 为主活动 （点击应用图标首先启动这个） -->
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.MainActivity"></activity>
+        <activity android:name=".activity.NavBaseActivity"></activity>
         <activity android:name=".activity.ChooseAreaActivity" />
         <activity android:name=".activity.WeatherActivity" />
         <activity android:name=".activity.MapActivity" />
@@ -70,10 +70,6 @@
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
-
-        <activity
-            android:name=".activity.HomeActivity"
-            android:label="@string/title_activity_home"></activity>
     </application>
 
 </manifest>

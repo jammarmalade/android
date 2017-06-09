@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:compat="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:icon="@drawable/ic_settings_white" />
+    <!--
+    showAsAction则指定了该按钮显示的位置，主要有以下几种值可选：
+    always  表示永远显示在ActionBar中，如果屏幕空间不够则无法显示，
+    ifRoom  表示屏幕空间够的情况下显示在ActionBar中，不够的话就显示在overflow中，
+    never   则表示永远显示在overflow中
+    -->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_white"
+        android:actionViewClass="android.widget.SearchView"
+        compat:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/action_search"
+        android:visible="false"/>
 </menu>

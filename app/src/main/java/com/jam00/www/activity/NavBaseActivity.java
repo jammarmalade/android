@@ -26,27 +26,21 @@ import com.jam00.www.util.LogUtil;
 
 import java.lang.reflect.Method;
 
-public class HomeActivity extends AppCompatActivity
+public class NavBaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String TAG = "HomeActivity";
+    public static final String TAG = "NavBaseActivity";
     public String toolBarTitle;
     public NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //沉浸式状态栏
-        if(Build.VERSION.SDK_INT >= 21){
-            //获取当前活动 DecorView
-            View decorView = getWindow().getDecorView();
-            //setSystemUiVisibility 改变系统 UI 显示，表示活动布局会显示在状态栏上
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            //设置状态栏为透明色
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
-        setContentView(R.layout.activity_home);
 
+
+    }
+    //初始化侧边栏导航栏等数据
+    public void initNav(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //设置 toolbar 的图标
 //          toolbar.setLogo(R.mipmap.ic_launcher);
@@ -63,8 +57,8 @@ public class HomeActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -98,47 +92,47 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
     //Overflow 列表显示图标
-//    @Override
-//    public boolean onMenuOpened(int featureId, Menu menu) {
-//        setOverflowIconVisible(featureId, menu);
-//        return super.onMenuOpened(featureId, menu);
-//    }
-//    /**
-//     * 显示OverflowMenu的Icon
-//     *
-//     * @param featureId
-//     * @param menu
-//     */
-//    private void setOverflowIconVisible(int featureId, Menu menu) {
-//        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-//            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-//                try {
-//                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
-//                    m.setAccessible(true);
-//                    m.invoke(menu, true);
-//                } catch (Exception e) {
-//                    LogUtil.d(TAG, "OverflowIconVisible - "+e.getMessage());
-//                }
-//            }
-//        }
-//    }
-//
-//    @Override
-//    protected boolean onPrepareOptionsPanel(View view, Menu menu) {
-//        //显示OverflowMenu的Icon (这个起作用)
-//        if (menu != null) {
-//            if (menu.getClass() == MenuBuilder.class) {
-//                try {
-//                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
-//                    m.setAccessible(true);
-//                    m.invoke(menu, true);
-//                } catch (Exception e) {
-//                    LogUtil.d(TAG, "OverflowIconVisible - "+e.getMessage());
-//                }
-//            }
-//        }
-//        return super.onPrepareOptionsPanel(view, menu);
-//    }
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        setOverflowIconVisible(featureId, menu);
+        return super.onMenuOpened(featureId, menu);
+    }
+    /**
+     * 显示OverflowMenu的Icon
+     *
+     * @param featureId
+     * @param menu
+     */
+    private void setOverflowIconVisible(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
+                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                } catch (Exception e) {
+                    LogUtil.d(TAG, "OverflowIconVisible - "+e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    protected boolean onPrepareOptionsPanel(View view, Menu menu) {
+        //显示OverflowMenu的Icon (这个起作用)
+        if (menu != null) {
+            if (menu.getClass() == MenuBuilder.class) {
+                try {
+                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                } catch (Exception e) {
+                    LogUtil.d(TAG, "OverflowIconVisible - "+e.getMessage());
+                }
+            }
+        }
+        return super.onPrepareOptionsPanel(view, menu);
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -180,13 +174,5 @@ public class HomeActivity extends AppCompatActivity
     //弹出消息
     public static void mToastStatic(String msg){
         Toast.makeText(BaseApplication.getContext(), msg, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * 启动本 活动
-     */
-    public static void actionStart(Context context) {
-        Intent intent = new Intent(context, HomeActivity.class);
-        context.startActivity(intent);
     }
 }
