@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +27,7 @@ import com.jam00.www.util.LogUtil;
 
 import java.lang.reflect.Method;
 
-public class NavBaseActivity extends AppCompatActivity
+public class NavBaseActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "NavBaseActivity";
@@ -43,15 +44,17 @@ public class NavBaseActivity extends AppCompatActivity
     public void initNav(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //设置 toolbar 的图标
-//          toolbar.setLogo(R.mipmap.ic_launcher);
+//        toolbar.setLogo(R.mipmap.ic_launcher);
         //顶部导航中间的文字（为使标题居中，要加一个textview）
         toolbar.setTitle("");
+//        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
         TextView textView = (TextView) findViewById(R.id.toolbar_title);
         textView.setText(toolBarTitle);
         setSupportActionBar(toolbar);//执行设定
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        toggle.setDrawerIndicatorEnabled(false);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -76,7 +79,7 @@ public class NavBaseActivity extends AppCompatActivity
         // 配置SearchView的属性
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
-        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+        MenuItemCompat.setOnActionExpandListener(searchItem,new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 mToast("打开 - 对应的 UI 操作");
@@ -132,7 +135,7 @@ public class NavBaseActivity extends AppCompatActivity
             }
         }
         return super.onPrepareOptionsPanel(view, menu);
-    };
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -142,7 +145,7 @@ public class NavBaseActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }
 
@@ -158,7 +161,8 @@ public class NavBaseActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             // Handle the camera action
         } else if (id == R.id.nav_weather) {
-
+            Intent intent = new Intent(this, WeatherActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_setting) {
 
         }
@@ -167,12 +171,5 @@ public class NavBaseActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    //弹出消息
-    public void mToast(String msg){
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-    //弹出消息
-    public static void mToastStatic(String msg){
-        Toast.makeText(BaseApplication.getContext(), msg, Toast.LENGTH_SHORT).show();
-    }
+
 }
