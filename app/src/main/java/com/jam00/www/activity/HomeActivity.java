@@ -8,7 +8,17 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.jam00.www.R;
+import com.jam00.www.adapter.TagAdapter;
+import com.jam00.www.custom.flowtaglayout.FlowTagLayout;
+import com.jam00.www.custom.flowtaglayout.OnTagClickListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomeActivity extends NavBaseActivity {
+    //测试
+    private FlowTagLayout checkFlowTagLayout;
+    private TagAdapter<String> checkTagAdapter;
 
     public static final String TAG = "HomeActivity";
     @Override
@@ -28,6 +38,37 @@ public class HomeActivity extends NavBaseActivity {
         toolBarTitle = "首页";
         initNav();
 
+
+        //测试
+        checkFlowTagLayout = (FlowTagLayout) findViewById(R.id.check_flow_layout);
+        //颜色
+        checkTagAdapter = new TagAdapter<>(this);
+        checkFlowTagLayout.setAdapter(checkTagAdapter);
+        checkFlowTagLayout.setOnTagClickListener(new OnTagClickListener() {
+            @Override
+            public void onItemClick(FlowTagLayout parent, View view, int position) {
+                mToast("删除 - "+parent.getAdapter().getItem(position));
+            }
+        });
+        initCheckData();
+
+    }
+
+    private void initCheckData() {
+        List<String> dataSource = new ArrayList<>();
+        dataSource.add("红色");
+        dataSource.add("黑色");
+        dataSource.add("花边色");
+        dataSource.add("深蓝色");
+        dataSource.add("白色");
+        dataSource.add("玫瑰红色");
+        dataSource.add("紫黑紫兰色");
+        dataSource.add("葡萄红色");
+        dataSource.add("屎黄色");
+        dataSource.add("绿色");
+        dataSource.add("彩虹色");
+        dataSource.add("牡丹色");
+        checkTagAdapter.onlyAddAll(dataSource);
     }
 
 
