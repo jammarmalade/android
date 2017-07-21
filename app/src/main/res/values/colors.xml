@@ -8,4 +8,9 @@
     <color name="white">#fff</color>
     <color name="pink">#F29EC2</color>
     <color name="red">#ff00</color>
+    <color name="red1">#FF4D4D</color>
+    <color name="recordOut">#FF7256</color>
+    <color name="recordIn">#9ACD32</color>
+    <color name="grey">#818181</color>
+    <color name="grey1">#FFFAFA</color>
 </resources>

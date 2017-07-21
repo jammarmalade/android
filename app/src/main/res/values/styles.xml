@@ -3,10 +3,12 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/pink</item>
-        <item name="colorPrimaryDark">@color/pink</item>
+        <!--标题栏颜色-->
+        <item name="colorPrimary">@color/red1</item>
+        <!--状态栏-->
+        <item name="colorPrimaryDark">@color/red1</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorPrimary">@color/black</item>
         <!--toolbar小汉堡样式-->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>

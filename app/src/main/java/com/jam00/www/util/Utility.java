@@ -8,6 +8,8 @@ import com.jam00.www.activity.BaseActivity;
 import com.jam00.www.db.City;
 import com.jam00.www.db.County;
 import com.jam00.www.db.Provice;
+import com.jam00.www.gson.Result;
+import com.jam00.www.gson.Tag;
 import com.jam00.www.gson.Weather;
 
 import org.json.JSONArray;
@@ -101,6 +103,28 @@ public class Utility {
             JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
             String weatherContent = jsonArray.getJSONObject(0).toString();
             return new Gson().fromJson(weatherContent, Weather.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
+     * 将返回的数据解析成 Tag 实体类
+     */
+    public static Tag handleTagResponse(String response){
+        try{
+            return new Gson().fromJson(response, Tag.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
+     * 将返回的数据解析成 Result 实体类，默认返回类
+     */
+    public static Result handleResultResponse(String response){
+        try{
+            return new Gson().fromJson(response, Result.class);
         }catch (Exception e){
             e.printStackTrace();
         }

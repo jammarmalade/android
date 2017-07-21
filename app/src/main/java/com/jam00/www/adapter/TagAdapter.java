@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.jam00.www.R;
 import com.jam00.www.custom.flowtaglayout.OnInitSelectedPosition;
+import com.jam00.www.gson.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,10 @@ import java.util.List;
  * Created by weijingtong20 on 2017/7/19.
  */
 
-public class TagAdapter<T> extends BaseAdapter implements OnInitSelectedPosition {
+public class TagAdapter extends BaseAdapter implements OnInitSelectedPosition {
 
     private final Context mContext;
-    private final List<T> mDataList;
+    private final List<Tag.info> mDataList;
 
     public TagAdapter(Context context) {
         this.mContext = context;
@@ -48,22 +49,49 @@ public class TagAdapter<T> extends BaseAdapter implements OnInitSelectedPosition
         View view = LayoutInflater.from(mContext).inflate(R.layout.tag_item, null);
 
         TextView textView = (TextView) view.findViewById(R.id.tv_tag);
-        T t = mDataList.get(position);
-
-        if (t instanceof String) {
-            textView.setText((String) t);
-        }
+        Tag.info t = mDataList.get(position);
+        textView.setText(t.name);
         return view;
     }
 
-    public void onlyAddAll(List<T> datas) {
+    public void onlyAddAll(List<Tag.info> datas) {
         mDataList.addAll(datas);
         notifyDataSetChanged();
     }
 
-    public void clearAndAddAll(List<T> datas) {
+    public void clearAndAddAll(List<Tag.info> datas) {
         mDataList.clear();
         onlyAddAll(datas);
+    }
+    public List<Tag.info> getData(){
+        return mDataList;
+    }
+    public String getTagIds(){
+        String tids = "",dot = "";
+        for(Tag.info tmpInfo : mDataList){
+            tids = dot+tmpInfo.id;
+            dot = ",";
+        }
+        return tids;
+    }
+    public Boolean addDataInfo(Tag.info info){
+        Boolean canAdd = true;
+        for(Tag.info tmpInfo : mDataList){
+            if(tmpInfo.id == info.id){
+                canAdd = false;
+                break;
+            }
+        }
+        if(canAdd){
+            mDataList.add(info);
+        }
+        return canAdd;
+    }
+    public void removeDataInfo(int pos){
+        mDataList.remove(pos);
+    }
+    public void notifyDataSet(){
+        notifyDataSetChanged();
     }
 
     @Override
