@@ -12,7 +12,7 @@ public class Tag {
     public String status;
     public String message;
     
-    @SerializedName("Result")
+    @SerializedName("result")
     public List<info> tagList;
 
     public static class info{

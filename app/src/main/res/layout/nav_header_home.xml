@@ -33,15 +33,17 @@
         android:id="@+id/head_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:textSize="18dp"
-        android:text="admin"
+        android:paddingTop="5dp"
+        android:textSize="18sp"
+        android:text="登录"
+        android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
         android:id="@+id/head_des"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="good good study,day day up!" />
+        android:textSize="16sp"
+        android:text="" />
 
 </LinearLayout>

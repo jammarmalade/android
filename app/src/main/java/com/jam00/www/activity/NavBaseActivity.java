@@ -2,9 +2,11 @@ package com.jam00.www.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -14,10 +16,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,11 +37,13 @@ public class NavBaseActivity extends BaseActivity
     public static final String TAG = "NavBaseActivity";
     public String toolBarTitle;
     public NavigationView navigationView;
+    //登录信息
+    public TextView userName;
+    public TextView userDes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
     }
     //初始化侧边栏导航栏等数据
@@ -53,13 +59,43 @@ public class NavBaseActivity extends BaseActivity
         setSupportActionBar(toolbar);//执行设定
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            // 当抽屉完全关闭时被调用
+            @Override
+            public void onDrawerClosed(View drawerView){
+
+            }
+            // 当抽屉完全打开时被调用
+            @Override
+            public void onDrawerOpened(View drawerView){
+                userName = (TextView)drawerView.findViewById(R.id.head_username);
+                userDes = (TextView)drawerView.findViewById(R.id.head_des);
+                //判断是否登录
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NavBaseActivity.this);
+                String username = prefs.getString("userName",null);
+                if(username!=null){
+                    userName.setText(username);
+                    userDes.setText(prefs.getString("des",""));
+                }else{
+                    //点击登录前往登录页面
+                    userName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                            drawer.closeDrawer(GravityCompat.START);
+                            LoginActivity.actionStart(NavBaseActivity.this);
+                        }
+                    });
+                }
+            }
+        };
 //        toggle.setDrawerIndicatorEnabled(false);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -159,7 +195,7 @@ public class NavBaseActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            HomeActivity.actionStart(this);
         } else if (id == R.id.nav_weather) {
             Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);

@@ -8,8 +8,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.jam00.www.R;
+import com.jam00.www.activity.HomeActivity;
 import com.jam00.www.custom.flowtaglayout.OnInitSelectedPosition;
 import com.jam00.www.gson.Tag;
+import com.jam00.www.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +71,7 @@ public class TagAdapter extends BaseAdapter implements OnInitSelectedPosition {
     public String getTagIds(){
         String tids = "",dot = "";
         for(Tag.info tmpInfo : mDataList){
-            tids = dot+tmpInfo.id;
+            tids = tids+dot+tmpInfo.id;
             dot = ",";
         }
         return tids;
@@ -77,7 +79,7 @@ public class TagAdapter extends BaseAdapter implements OnInitSelectedPosition {
     public Boolean addDataInfo(Tag.info info){
         Boolean canAdd = true;
         for(Tag.info tmpInfo : mDataList){
-            if(tmpInfo.id == info.id){
+            if(info.id.toString().equals(tmpInfo.id.toString())){
                 canAdd = false;
                 break;
             }

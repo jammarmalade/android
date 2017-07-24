@@ -8,18 +8,19 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.app.DatePickerDialog.OnDateSetListener;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
-import com.baidu.mapapi.map.Text;
 import com.jam00.www.R;
 import com.jam00.www.adapter.TagAdapter;
 import com.jam00.www.custom.flowtaglayout.FlowTagLayout;
@@ -32,13 +33,12 @@ import com.jam00.www.util.LogUtil;
 import com.jam00.www.util.Utility;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -74,7 +74,9 @@ public class HomeActivity extends NavBaseActivity {
     //提交的数据
     private HashMap<String,String> postParams = new HashMap<>();
     //备注
-
+    private EditText remark;
+    //金额
+    private EditText money;
 
     public static final String TAG = "HomeActivity";
 
@@ -90,7 +92,12 @@ public class HomeActivity extends NavBaseActivity {
             //设置状态栏为透明色
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_common);
+        //使用layoutInflater布局
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.content_main);
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View contentLayout = layoutInflater.inflate(R.layout.activity_home, null);
+        mainLayout.addView(contentLayout);
 
         toolBarTitle = "记录点滴";
         initNav();
@@ -190,51 +197,35 @@ public class HomeActivity extends NavBaseActivity {
                 accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordIn));
             }
         });
+        remark = (EditText)findViewById(R.id.record_remark);
+        money = (EditText)findViewById(R.id.record_money);
+        //限制只能输入小数点后两位
+        money.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                String temp = s.toString();
+                int posDot = temp.indexOf(".");
+                if (posDot <= 0) return;
+                if (temp.length() - posDot - 1 > 2) {
+                    s.delete(posDot + 3, posDot + 4);
+                }
+            }
+        });
         //提交按钮
         submitBtn = (Button)findViewById(R.id.submit_record);
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "";
-                postParams.put("type",String.valueOf(recordType));
-                //标签id
-                postParams.put("tagIds",checkTagAdapter.getTagIds());
-                //备注
-
-                HttpUtil.postRequest(url, postParams, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                        //在主线程中执行
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                BaseActivity.mToastStatic("提交失败");
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        final String responseText = response.body().string();
-                        final Result res = Utility.handleResultResponse(responseText);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (res != null && "true".equals(res.status.toString())) {
-                                    BaseActivity.mToastStatic("提交成功");
-                                } else {
-                                    BaseActivity.mToastStatic("提交失败");
-                                }
-                            }
-                        });
-                    }
-                });
+                addOrEditRecord();
             }
         });
     }
 
-    //弹出框
+    //添加标签弹出框
     private void showAddTagDialog() {
         alertDialogBuilder = new AlertDialog.Builder(this);
 //        alertDialogBuilder.setIcon(R.mipmap.ic_launcher);
@@ -250,24 +241,45 @@ public class HomeActivity extends NavBaseActivity {
         alertDialogBuilder.setView(loginDialog);
 //        alertDialogBuilder.setMessage("内容");
 
-        //点击添加事件
+        //点击添加标签事件
         alertDialogBuilder.setPositiveButton("添加", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 EditText addTag = (EditText)loginDialog.findViewById(R.id.add_tag_name);
                 String addTagName = addTag.getText().toString();
-                mToast("添加 - "+addTagName);
                 if (checkTagAdapter.getCount() >= 5) {
                     mToast("最多只能选五个标签");
                 } else {
-                    Tag.info info = new Tag.info();
-                    info.id = "1";
-                    info.name = addTagName;
-                    if(checkTagAdapter.addDataInfo(info)){
-                        checkTagAdapter.notifyDataSet();
-                    }else{
-                        mToast("该标签已存在");
-                    }
+                    //添加标签
+                    String url = REQUEST_HOST+"/tag/addtag";
+                    HashMap<String ,String> params = new HashMap<String, String>() ;
+                    params.put("name",addTagName);
+                    HttpUtil.postRequest(url, params, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            BaseActivity.mToastStatic("发送失败");
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            final String responseText = response.body().string();
+                            final Tag tag = Utility.handleTagResponse(responseText);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (tag != null && "true".equals(tag.status.toString())) {
+                                        if(checkTagAdapter.addDataInfo(tag.tagList.get(0))){
+                                            checkTagAdapter.notifyDataSet();
+                                        }else{
+                                            mToast("该标签已存在");
+                                        }
+                                    } else {
+                                        BaseActivity.mToastStatic("获取信息失败");
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
             }
         });
@@ -284,12 +296,69 @@ public class HomeActivity extends NavBaseActivity {
         addTagDialog = alertDialogBuilder.create();
         addTagDialog.show();
     }
+    //提交记录
+    public void addOrEditRecord(){
+        String url = REQUEST_HOST+"/record/add";
+        postParams.put("type",String.valueOf(recordType));
+        //标签id
+        postParams.put("tids",checkTagAdapter.getTagIds());
+        //备注
+        postParams.put("content",remark.getText().toString());
+        //金额
+        postParams.put("account",money.getText().toString());
+        //当前经纬度
+        postParams.put("longitude",longitude);
+        postParams.put("latitude",latitude);
+        //日期
+        postParams.put("date",recordDate.getText().toString());
+        if("".equals(postParams.get("account"))){
+            mToast("请输入金额");
+            return ;
+        }
+        if(checkTagAdapter.getCount() <= 0){
+            mToast("请至少选择一个标签");
+            return ;
+        }
+        HttpUtil.postRequest(url, postParams, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                //在主线程中执行
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BaseActivity.mToastStatic("提交失败");
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responseText = response.body().string();
+                final Result res = Utility.handleResultResponse(responseText);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (res != null && "true".equals(res.status.toString())) {
+                            BaseActivity.mToastStatic("提交成功");
+                            remark.setText("");
+                            money.setText("");
+                            //初始化选择标签
+                            checkTagAdapter.clearAndAddAll(new ArrayList<Tag.info>());
+                            money.requestFocus();
+                        } else {
+                            BaseActivity.mToastStatic(res.message);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     //获取常用的标签
     private void getShowTagData() {
-        String tagUrl = REQUEST_HOST + "/user/tag";
-        LogUtil.d(TAG, tagUrl);
-        HttpUtil.sendOkHttpRequest(tagUrl, new Callback() {
+        String tagUrl = REQUEST_HOST + "/tag/recommend";
+        HttpUtil.postRequest(tagUrl,new HashMap<String, String>() ,new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -306,13 +375,14 @@ public class HomeActivity extends NavBaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
                 final Tag tag = Utility.handleTagResponse(responseText);
+                LogUtil.d(TAG, responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (tag != null && "true".equals(tag.status.toString())) {
                             showTagAdapter.onlyAddAll(tag.tagList);
                         } else {
-                            BaseActivity.mToastStatic("获取信息失败");
+                            BaseActivity.mToastStatic(tag.message);
                         }
                     }
                 });

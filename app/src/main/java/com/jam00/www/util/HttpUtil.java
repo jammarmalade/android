@@ -1,5 +1,7 @@
 package com.jam00.www.util;
 
+import com.jam00.www.activity.BaseActivity;
+
 import java.net.URLEncoder;
 import java.util.HashMap;
 
@@ -30,6 +32,7 @@ public class HttpUtil {
         for (String key : paramsMap.keySet()) {
             builder.add(key, paramsMap.get(key));
         }
+        builder.add("authkey", BaseActivity.USER_AUTH_KEY);
         RequestBody body = builder.build();
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).post(body).build();
