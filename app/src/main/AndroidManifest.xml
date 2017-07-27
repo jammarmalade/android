@@ -59,6 +59,7 @@
         </activity>
         <activity android:name=".activity.NavBaseActivity"></activity>
         <activity android:name=".activity.LoginActivity"></activity>
+        <activity android:name=".activity.RecordActivity"></activity>
         <activity android:name=".activity.ChooseAreaActivity" />
         <activity android:name=".activity.WeatherActivity" />
         <activity android:name=".activity.MapActivity" />

@@ -2,12 +2,17 @@ package com.jam00.www.util;
 
 import android.app.ProgressDialog;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.jam00.www.activity.BaseActivity;
 import com.jam00.www.db.City;
 import com.jam00.www.db.County;
 import com.jam00.www.db.Provice;
+import com.jam00.www.gson.Login;
 import com.jam00.www.gson.Result;
 import com.jam00.www.gson.Tag;
 import com.jam00.www.gson.Weather;
@@ -131,12 +136,51 @@ public class Utility {
         return null;
     }
     /**
+     * 将返回的数据解析成 Login 实体类，默认返回类
+     */
+    public static Login handleLoginResponse(String response){
+        try{
+            return new Gson().fromJson(response, Login.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
+     * 将返回的数据解析成 对应的 实体类
+     */
+    public static Object handleResponse(String response, Class t){
+        try{
+            return new Gson().fromJson(response, (Class<? extends Class>) t);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
      * 获取当前时间（格式化）
      */
     public static String getNowTime(){
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//24小时制
         return sdformat.format(date);
+    }
+    //计算listView 的高度
+    public static void setListViewHeight(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
+        }
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 
 }

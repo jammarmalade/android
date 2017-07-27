@@ -7,12 +7,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +21,6 @@ import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
 import com.bumptech.glide.Glide;
 import com.jam00.www.R;
 import com.jam00.www.gson.Forecast;
@@ -32,20 +28,11 @@ import com.jam00.www.gson.Weather;
 import com.jam00.www.service.AutoUpdateService;
 import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LbsUtil;
-import com.jam00.www.util.LogUtil;
 import com.jam00.www.util.Utility;
-import com.umeng.message.MsgConstant;
-import com.umeng.message.PushAgent;
-import com.umeng.message.common.UmengMessageDeviceConfig;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.jar.Manifest;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -234,7 +221,7 @@ public class WeatherActivity extends BaseActivity {
             //清空所有“未来几天天气”的数据
             forecastLayout.removeAllViews();
             for(Forecast forecast : weather.forecastList){
-                View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
+                View view = LayoutInflater.from(this).inflate(R.layout.weather_forecast_item, forecastLayout, false);
                 TextView dateText = (TextView)view.findViewById(R.id.date_text);
                 TextView infoText = (TextView)view.findViewById(R.id.info_text);
                 TextView maxText = (TextView)view.findViewById(R.id.max_text);

@@ -21,12 +21,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.jam00.www.R;
+import com.jam00.www.util.ActivityCollector;
 import com.jam00.www.util.BaseApplication;
+import com.jam00.www.util.GlideCircleTransform;
 import com.jam00.www.util.LogUtil;
 
 import java.lang.reflect.Method;
@@ -40,6 +44,7 @@ public class NavBaseActivity extends BaseActivity
     //登录信息
     public TextView userName;
     public TextView userDes;
+    public TextView loginOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,20 +75,52 @@ public class NavBaseActivity extends BaseActivity
             public void onDrawerOpened(View drawerView){
                 userName = (TextView)drawerView.findViewById(R.id.head_username);
                 userDes = (TextView)drawerView.findViewById(R.id.head_des);
+                loginOut = (TextView)drawerView.findViewById(R.id.login_out);
+                //用户头像
+                ImageView userHead = (ImageView)drawerView.findViewById(R.id.head_image);
                 //判断是否登录
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NavBaseActivity.this);
-                String username = prefs.getString("userName",null);
+                String username = prefs.getString("username",null);
+                String head = prefs.getString("head",null);
                 if(username!=null){
+                    if(head!=null){
+                        //设置用户头像
+                        Glide.with(BaseApplication.getContext()).load(head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
+                    }else{
+                        Glide.with(BaseApplication.getContext()).load(R.drawable.default_head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
+                    }
                     userName.setText(username);
                     userDes.setText(prefs.getString("des",""));
+                    //退出登录
+                    loginOut.setVisibility(View.VISIBLE);
+                    loginOut.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(NavBaseActivity.this).edit();
+                            editor.putString("userid",null);
+                            editor.putString("username",null);
+                            editor.putString("authkey",null);
+                            editor.putString("head",null);
+                            editor.putString("des",null);
+                            editor.apply();
+                            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                            drawer.closeDrawer(GravityCompat.START);
+                            ActivityCollector.finishAll();
+                            HomeActivity.actionStart(NavBaseActivity.this);
+                        }
+                    });
                 }else{
+                    //设置用户头像
+                    Glide.with(BaseApplication.getContext()).load(R.drawable.default_head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
                     //点击登录前往登录页面
                     userName.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                             drawer.closeDrawer(GravityCompat.START);
-                            LoginActivity.actionStart(NavBaseActivity.this);
+                            if(!"LoginActivity".equals(activityName)){
+                                LoginActivity.actionStart(NavBaseActivity.this);
+                            }
                         }
                     });
                 }
@@ -195,12 +232,18 @@ public class NavBaseActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            HomeActivity.actionStart(this);
+            if(!"HomeActivity".equals(activityName)){
+                HomeActivity.actionStart(this);
+            }
         } else if (id == R.id.nav_weather) {
-            Intent intent = new Intent(this, WeatherActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_setting) {
-
+            if(!"WeatherActivity".equals(activityName)){
+                Intent intent = new Intent(this, WeatherActivity.class);
+                startActivity(intent);
+            }
+        } else if (id == R.id.nav_record) {
+            if(!"RecordActivity".equals(activityName)){
+                RecordActivity.actionStart(this);
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

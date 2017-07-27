@@ -27,6 +27,7 @@ import com.jam00.www.custom.flowtaglayout.FlowTagLayout;
 import com.jam00.www.custom.flowtaglayout.OnTagClickListener;
 import com.jam00.www.gson.Result;
 import com.jam00.www.gson.Tag;
+import com.jam00.www.gson.TagInfo;
 import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LbsUtil;
 import com.jam00.www.util.LogUtil;
@@ -123,7 +124,7 @@ public class HomeActivity extends NavBaseActivity {
                 if (checkTagAdapter.getCount() >= 5) {
                     mToast("最多只能选五个标签");
                 } else {
-                    if(checkTagAdapter.addDataInfo((Tag.info) parent.getAdapter().getItem(position))){
+                    if(checkTagAdapter.addDataInfo((TagInfo) parent.getAdapter().getItem(position))){
                         checkTagAdapter.notifyDataSet();
                     }else{
                         mToast("该标签已存在");
@@ -163,7 +164,7 @@ public class HomeActivity extends NavBaseActivity {
                         recordDate.setText(date);
                         mToast(date);
                     }
-                },year, month, day);
+                },year, month - 1, day);
                 datePickerDialog.show();
             }
         });
@@ -274,7 +275,7 @@ public class HomeActivity extends NavBaseActivity {
                                             mToast("该标签已存在");
                                         }
                                     } else {
-                                        BaseActivity.mToastStatic("获取信息失败");
+                                        BaseActivity.mToastStatic(tag.message);
                                     }
                                 }
                             });
@@ -298,6 +299,9 @@ public class HomeActivity extends NavBaseActivity {
     }
     //提交记录
     public void addOrEditRecord(){
+        if(httpSending){
+            return ;
+        }
         String url = REQUEST_HOST+"/record/add";
         postParams.put("type",String.valueOf(recordType));
         //标签id
@@ -319,9 +323,11 @@ public class HomeActivity extends NavBaseActivity {
             mToast("请至少选择一个标签");
             return ;
         }
+        httpSending = true;
         HttpUtil.postRequest(url, postParams, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                httpSending = false;
                 e.printStackTrace();
                 //在主线程中执行
                 runOnUiThread(new Runnable() {
@@ -334,6 +340,7 @@ public class HomeActivity extends NavBaseActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                httpSending = false;
                 final String responseText = response.body().string();
                 final Result res = Utility.handleResultResponse(responseText);
                 runOnUiThread(new Runnable() {
@@ -344,7 +351,7 @@ public class HomeActivity extends NavBaseActivity {
                             remark.setText("");
                             money.setText("");
                             //初始化选择标签
-                            checkTagAdapter.clearAndAddAll(new ArrayList<Tag.info>());
+                            checkTagAdapter.clearAndAddAll(new ArrayList<TagInfo>());
                             money.requestFocus();
                         } else {
                             BaseActivity.mToastStatic(res.message);
@@ -375,7 +382,6 @@ public class HomeActivity extends NavBaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
                 final Tag tag = Utility.handleTagResponse(responseText);
-                LogUtil.d(TAG, responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

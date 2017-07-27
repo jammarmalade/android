@@ -13,11 +13,6 @@ public class Tag {
     public String message;
     
     @SerializedName("result")
-    public List<info> tagList;
+    public List<TagInfo> tagList;
 
-    public static class info{
-        public String id;
-        public String name;
-        public String img;
-    }
 }

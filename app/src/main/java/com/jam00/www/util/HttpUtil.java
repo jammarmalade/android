@@ -1,6 +1,10 @@
 package com.jam00.www.util;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import com.jam00.www.activity.BaseActivity;
+import com.jam00.www.activity.NavBaseActivity;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -32,7 +36,9 @@ public class HttpUtil {
         for (String key : paramsMap.keySet()) {
             builder.add(key, paramsMap.get(key));
         }
-        builder.add("authkey", BaseActivity.USER_AUTH_KEY);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getContext());
+        String authkey = prefs.getString("authkey","");
+        builder.add("authkey", authkey);
         RequestBody body = builder.build();
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).post(body).build();
