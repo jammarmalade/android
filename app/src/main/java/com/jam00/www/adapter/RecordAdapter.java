@@ -1,6 +1,8 @@
 package com.jam00.www.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +23,7 @@ import java.util.List;
  * Created by weijingtong20 on 2017/7/26.
  */
 
-public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener{
 
     private Context mContext;
     private List<Record.info> dataList;
@@ -29,10 +31,12 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private TagAdapter showTagAdapter;
     private String account;
 
+
     public RecordAdapter(Context c , List<Record.info> dataList){
         super();
         this.mContext = c;
         this.dataList = dataList;
+
     }
 
     public List<Record.info> getmDataList(){
@@ -43,8 +47,10 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         RecyclerView.ViewHolder holder = null;
         switch (viewType){
             case 1:
-                listHolder listHolder = new listHolder(LayoutInflater.from(mContext).inflate(R.layout.record_list_item, parent, false));
+                View view = LayoutInflater.from(mContext).inflate(R.layout.record_list_item, parent, false);
+                listHolder listHolder = new listHolder(view);
                 holder = listHolder;
+                view.setOnClickListener(this);
                 break;
         }
         return holder;
@@ -59,11 +65,13 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 //金额
                 if(recordInfo.type == 1){
                     account = " - "+recordInfo.account;
+                    listHolder.recordAccount.setText(account);
                 }
                 if(recordInfo.type == 2){
                     account = " + "+recordInfo.account;
+                    listHolder.recordAccount.setText(account);
+                    listHolder.recordAccount.setTextColor(ContextCompat.getColor(mContext,R.color.green1));
                 }
-                listHolder.recordAccount.setText(account);
                 //记录时间
                 listHolder.recordCreateTime.setText(recordInfo.showTime);
                 //备注内容
@@ -72,6 +80,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 showTagAdapter = new TagAdapter(mContext);
                 listHolder.showTagLayout.setAdapter(showTagAdapter);
                 showTagAdapter.onlyAddAll(recordInfo.tagList);
+                listHolder.itemView.setTag(position);
                 break;
         }
     }
@@ -85,12 +94,19 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return dataList.size();
     }
     //监听事件的回调方法接口
-    public interface OnItemClickLitener {
-        void onItemClick(View view, int position);
+    private OnItemClickListener mOnItemClickListener = null;
+    public interface OnItemClickListener {
+        void onItemClick(View view , int position);
     }
-    private OnItemClickLitener mOnItemClickLitener;
-    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener) {
-        this.mOnItemClickLitener = mOnItemClickLitener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
+    }
+    @Override
+    public void onClick(View v) {
+        if (mOnItemClickListener != null) {
+            //注意这里使用getTag方法获取position
+            mOnItemClickListener.onItemClick(v,(int)v.getTag());
+        }
     }
     class listHolder extends RecyclerView.ViewHolder{
         TextView recordAccount;

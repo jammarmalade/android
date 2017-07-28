@@ -8,8 +8,10 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -63,6 +65,7 @@ public class RecordActivity extends BaseActivity implements View.OnClickListener
     private final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
     private RecordAdapter recordAdapter;
 
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,14 +117,16 @@ public class RecordActivity extends BaseActivity implements View.OnClickListener
                             //RecyclerView
                             mRecyclerView = (RecyclerView) findViewById(R.id.reocrd_layout_RV);
                             mRecyclerView.setLayoutManager(linearLayoutManager);
+                            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
                             recordAdapter = new RecordAdapter(RecordActivity.this,recordList);
-                            recordAdapter.setOnItemClickLitener(new RecordAdapter.OnItemClickLitener() {
+                            recordAdapter.setOnItemClickListener(new RecordAdapter.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(View view, int position) {
-                                    mToast("pos - "+position);
+                                    mToast(view.getId()+" - "+position);
                                 }
                             });
                             mRecyclerView.setAdapter(recordAdapter);
+
                         } else {
                             BaseActivity.mToastStatic(record.message);
                         }
