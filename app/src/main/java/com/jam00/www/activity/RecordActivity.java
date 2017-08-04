@@ -107,7 +107,6 @@ public class RecordActivity extends BaseActivity implements View.OnClickListener
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
-                LogUtil.d(HomeActivity.TAG,responseText);
                 final Record record = (Record) Utility.handleResponse(responseText, Record.class);
                 runOnUiThread(new Runnable() {
                     @Override

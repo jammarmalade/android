@@ -57,10 +57,11 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
         setContentView(R.layout.activity_common);
         //判断是否登录
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String username = prefs.getString("username",null);
-        if(username!=null){
+        String authkey = prefs.getString("authkey",null);
+        if(authkey!=null){
             HomeActivity.actionStart(this);
         }
+        String username = prefs.getString("username",null);
 
         //使用layoutInflater布局
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.content_main);
@@ -72,6 +73,9 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
         initNav();
 
         loginUserName = (EditText)findViewById(R.id.login_username);
+        if(username!=null){
+            loginUserName.setText(username);
+        }
         loginPassword = (EditText)findViewById(R.id.login_password);
         loginBtn = (Button)findViewById(R.id.login_btn);
         loginBtn.setOnClickListener(this);
@@ -98,6 +102,7 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
                     mToast("密码最少六位");
                     return ;
                 }
+                Utility.showProgressDialog(LoginActivity.this,"");
                 HashMap<String,String> params = new HashMap<>();
                 params.put("username",username);
                 params.put("password",password);
@@ -106,11 +111,12 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
                     @Override
                     public void onFailure(Call call, IOException e) {
                         BaseActivity.mToastStatic("请求失败");
+                        Utility.closeProgressDialog();
                     }
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         final String responseText = response.body().string();
-                        final Login login = Utility.handleLoginResponse(responseText);
+                        final Login login = (Login) Utility.handleResponse(responseText, Login.class);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -128,6 +134,7 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
                                 } else {
                                     BaseActivity.mToastStatic(login.message);
                                 }
+                                Utility.closeProgressDialog();
                             }
                         });
                     }

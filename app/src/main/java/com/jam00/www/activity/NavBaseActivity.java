@@ -80,9 +80,10 @@ public class NavBaseActivity extends BaseActivity
                 ImageView userHead = (ImageView)drawerView.findViewById(R.id.head_image);
                 //判断是否登录
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NavBaseActivity.this);
+                String authkey = prefs.getString("authkey",null);
                 String username = prefs.getString("username",null);
                 String head = prefs.getString("head",null);
-                if(username!=null){
+                if(authkey!=null){
                     if(head!=null){
                         //设置用户头像
                         Glide.with(BaseApplication.getContext()).load(head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
@@ -98,9 +99,9 @@ public class NavBaseActivity extends BaseActivity
                         public void onClick(View v) {
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(NavBaseActivity.this).edit();
                             editor.putString("userid",null);
-                            editor.putString("username",null);
+//                            editor.putString("username",null);
                             editor.putString("authkey",null);
-                            editor.putString("head",null);
+//                            editor.putString("head",null);
                             editor.putString("des",null);
                             editor.apply();
                             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -236,8 +237,8 @@ public class NavBaseActivity extends BaseActivity
                 HomeActivity.actionStart(this);
             }
         } else if (id == R.id.nav_weather) {
-            if(!"WeatherActivity".equals(activityName)){
-                Intent intent = new Intent(this, WeatherActivity.class);
+            if(!"ChooseAreaActivity".equals(activityName)){
+                Intent intent = new Intent(this, ChooseAreaActivity.class);
                 startActivity(intent);
             }
         } else if (id == R.id.nav_record) {

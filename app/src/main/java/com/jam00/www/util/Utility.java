@@ -1,5 +1,6 @@
 package com.jam00.www.util;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.text.TextUtils;
 import android.view.View;
@@ -114,39 +115,6 @@ public class Utility {
         return null;
     }
     /**
-     * 将返回的数据解析成 Tag 实体类
-     */
-    public static Tag handleTagResponse(String response){
-        try{
-            return new Gson().fromJson(response, Tag.class);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-    /**
-     * 将返回的数据解析成 Result 实体类，默认返回类
-     */
-    public static Result handleResultResponse(String response){
-        try{
-            return new Gson().fromJson(response, Result.class);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-    /**
-     * 将返回的数据解析成 Login 实体类，默认返回类
-     */
-    public static Login handleLoginResponse(String response){
-        try{
-            return new Gson().fromJson(response, Login.class);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-    /**
      * 将返回的数据解析成 对应的 实体类
      */
     public static Object handleResponse(String response, Class t){
@@ -183,4 +151,24 @@ public class Utility {
         listView.setLayoutParams(params);
     }
 
+    //显示对话框
+    public static void showProgressDialog(Activity activity, String msg) {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(activity);
+            if("".equals(msg)){
+                msg = "正在请求...";
+            }
+            progressDialog.setMessage(msg);
+            //点击屏幕其它地方是否会消失
+            progressDialog.setCanceledOnTouchOutside(false);
+        }
+        progressDialog.show();
+    }
+
+    //关闭对话框
+    public static void closeProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
 }

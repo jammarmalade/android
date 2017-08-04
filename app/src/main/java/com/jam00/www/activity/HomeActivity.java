@@ -45,6 +45,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.jam00.www.util.Utility.closeProgressDialog;
+
 public class HomeActivity extends NavBaseActivity {
     //标签
     private FlowTagLayout checkFlowTagLayout;
@@ -251,6 +253,7 @@ public class HomeActivity extends NavBaseActivity {
                 if (checkTagAdapter.getCount() >= 5) {
                     mToast("最多只能选五个标签");
                 } else {
+                    Utility.showProgressDialog(HomeActivity.this,"");
                     //添加标签
                     String url = REQUEST_HOST+"/tag/addtag";
                     HashMap<String ,String> params = new HashMap<String, String>() ;
@@ -259,12 +262,13 @@ public class HomeActivity extends NavBaseActivity {
                         @Override
                         public void onFailure(Call call, IOException e) {
                             BaseActivity.mToastStatic("发送失败");
+                            Utility.closeProgressDialog();
                         }
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             final String responseText = response.body().string();
-                            final Tag tag = Utility.handleTagResponse(responseText);
+                            final Tag tag = (Tag) Utility.handleResponse(responseText,Tag.class);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -277,6 +281,7 @@ public class HomeActivity extends NavBaseActivity {
                                     } else {
                                         BaseActivity.mToastStatic(tag.message);
                                     }
+                                    Utility.closeProgressDialog();
                                 }
                             });
                         }
@@ -324,6 +329,7 @@ public class HomeActivity extends NavBaseActivity {
             return ;
         }
         httpSending = true;
+        Utility.showProgressDialog(HomeActivity.this,"");
         HttpUtil.postRequest(url, postParams, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -334,6 +340,7 @@ public class HomeActivity extends NavBaseActivity {
                     @Override
                     public void run() {
                         BaseActivity.mToastStatic("提交失败");
+                        Utility.closeProgressDialog();
                     }
                 });
             }
@@ -342,7 +349,7 @@ public class HomeActivity extends NavBaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 httpSending = false;
                 final String responseText = response.body().string();
-                final Result res = Utility.handleResultResponse(responseText);
+                final Result res = (Result) Utility.handleResponse(responseText, Result.class);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -356,6 +363,7 @@ public class HomeActivity extends NavBaseActivity {
                         } else {
                             BaseActivity.mToastStatic(res.message);
                         }
+                        Utility.closeProgressDialog();
                     }
                 });
             }
@@ -381,7 +389,7 @@ public class HomeActivity extends NavBaseActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
-                final Tag tag = Utility.handleTagResponse(responseText);
+                final Tag tag = (Tag) Utility.handleResponse(responseText, Tag.class);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -1,6 +1,7 @@
 package com.jam00.www.activity;
 
 import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,7 +24,8 @@ public class BaseActivity extends AppCompatActivity {
     private long mExitTime;
 
 //    public static final String REQUEST_HOST = "http://guolin.tech/api/";//请求地址
-    public static final String REQUEST_HOST = "http://192.168.1.100/advanced/api/web/index.php/v1";//本地
+//    public static final String REQUEST_HOST = "http://192.168.1.100/advanced/api/web/index.php/v1";//本地
+    public static final String REQUEST_HOST = "http://api.jam00.com/v1";//线上
     public static final String USER_AUTH_KEY = "a627Q2FAa9H1xmGLOlONEcAtVw8DMnP2ZfMEi80FJzFs5CJY";//用户登录key
     //是否有请求正在执行
     public Boolean httpSending = false;
