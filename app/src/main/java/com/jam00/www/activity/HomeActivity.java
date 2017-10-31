@@ -436,7 +436,7 @@ public class HomeActivity extends NavBaseActivity {
             locationInfo.put("province",location.getProvince());
             locationInfo.put("city",location.getCity());
             locationInfo.put("district",location.getDistrict());
-            locationInfo.put("street",location.getStreet());
+            locationInfo.put("street",location.getStreet()+location.getStreetNumber());
 
             latitude = locationInfo.get("latitude");
             longitude = locationInfo.get("longitude");
