@@ -5,9 +5,11 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import com.jam00.www.custom.flowtaglayout.OnTagClickListener;
 import com.jam00.www.gson.Result;
 import com.jam00.www.gson.Tag;
 import com.jam00.www.gson.TagInfo;
+import com.jam00.www.util.BaseApplication;
 import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LbsUtil;
 import com.jam00.www.util.LogUtil;
@@ -80,6 +83,8 @@ public class HomeActivity extends NavBaseActivity {
     private EditText remark;
     //金额
     private EditText money;
+    //地址信息
+    private Map<String,String> locationInfo = new HashMap<String,String>();
 
     public static final String TAG = "HomeActivity";
 
@@ -123,8 +128,8 @@ public class HomeActivity extends NavBaseActivity {
         showFlowTagLayout.setOnTagClickListener(new OnTagClickListener() {
             @Override
             public void onItemClick(FlowTagLayout parent, View view, int position) {
-                if (checkTagAdapter.getCount() >= 5) {
-                    mToast("最多只能选五个标签");
+                if (checkTagAdapter.getCount() >= 10) {
+                    mToast("最多只能选十个标签");
                 } else {
                     if(checkTagAdapter.addDataInfo((TagInfo) parent.getAdapter().getItem(position))){
                         checkTagAdapter.notifyDataSet();
@@ -250,8 +255,8 @@ public class HomeActivity extends NavBaseActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 EditText addTag = (EditText)loginDialog.findViewById(R.id.add_tag_name);
                 String addTagName = addTag.getText().toString();
-                if (checkTagAdapter.getCount() >= 5) {
-                    mToast("最多只能选五个标签");
+                if (checkTagAdapter.getCount() >= 10) {
+                    mToast("最多只能选十个标签");
                 } else {
                     Utility.showProgressDialog(HomeActivity.this,"");
                     //添加标签
@@ -315,9 +320,14 @@ public class HomeActivity extends NavBaseActivity {
         postParams.put("content",remark.getText().toString());
         //金额
         postParams.put("account",money.getText().toString());
-        //当前经纬度
+        //当前经纬度地址
         postParams.put("longitude",longitude);
         postParams.put("latitude",latitude);
+        postParams.put("country",locationInfo.get("country"));
+        postParams.put("province",locationInfo.get("province"));
+        postParams.put("city",locationInfo.get("city"));
+        postParams.put("area",locationInfo.get("district"));
+        postParams.put("address",locationInfo.get("street"));
         //日期
         postParams.put("date",recordDate.getText().toString());
         if("".equals(postParams.get("account"))){
@@ -328,6 +338,7 @@ public class HomeActivity extends NavBaseActivity {
             mToast("请至少选择一个标签");
             return ;
         }
+
         httpSending = true;
         Utility.showProgressDialog(HomeActivity.this,"");
         HttpUtil.postRequest(url, postParams, new Callback() {
@@ -350,6 +361,7 @@ public class HomeActivity extends NavBaseActivity {
                 httpSending = false;
                 final String responseText = response.body().string();
                 final Result res = (Result) Utility.handleResponse(responseText, Result.class);
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -415,22 +427,21 @@ public class HomeActivity extends NavBaseActivity {
             }else if(location.getLocType()==BDLocation.TypeNetWorkLocation){
                 type = "网络";
             }
-            final String finaltype = type;
+            String finaltype = type;
 
-            Map<String,String> locationInfo = new HashMap<String,String>(){{
-                put("latitude",Double.toString(location.getLatitude()));
-                put("longitude",Double.toString(location.getLongitude()));
-                put("type",finaltype);
-                put("county",location.getCountry());//国家
-                put("province",location.getProvince());//省
-                put("city",location.getCity());//城市
-                put("district",location.getDistrict());//区
-                put("street",location.getStreet());//街道
-            }};
+            locationInfo.put("latitude",Double.toString(location.getLatitude()));
+            locationInfo.put("longitude",Double.toString(location.getLongitude()));
+            locationInfo.put("type",finaltype);
+            locationInfo.put("country",location.getCountry());
+            locationInfo.put("province",location.getProvince());
+            locationInfo.put("city",location.getCity());
+            locationInfo.put("district",location.getDistrict());
+            locationInfo.put("street",location.getStreet());
+
             latitude = locationInfo.get("latitude");
             longitude = locationInfo.get("longitude");
             //获取详细地址信息
-            String s = locationInfo.get("county")+locationInfo.get("province")+locationInfo.get("city")+locationInfo.get("district")+locationInfo.get("street");
+            String s = locationInfo.get("country")+locationInfo.get("province")+locationInfo.get("city")+locationInfo.get("district")+locationInfo.get("street");
             recordLocation.setText(s);
         }
     }
