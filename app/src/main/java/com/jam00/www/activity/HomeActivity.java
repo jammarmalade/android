@@ -23,6 +23,7 @@ import android.app.DatePickerDialog.OnDateSetListener;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
+import com.baidu.mapapi.map.Text;
 import com.jam00.www.R;
 import com.jam00.www.adapter.TagAdapter;
 import com.jam00.www.custom.flowtaglayout.FlowTagLayout;
@@ -43,6 +44,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -65,6 +67,8 @@ public class HomeActivity extends NavBaseActivity {
     private TextView recordDate;
     //地址显示
     private TextView recordLocation;
+    //记录显示标题
+    private TextView recordTitle;
     //lbs
     private LbsUtil lbsUtil;
     private String latitude;//纬度
@@ -73,8 +77,10 @@ public class HomeActivity extends NavBaseActivity {
     private int recordType = 1 ;
     private Button inBtn;
     private Button outBtn;
+    private Button recordBtn;
     private TextView showType;
     private LinearLayout accountWriteArea;//输入金额的区域
+    private LinearLayout recordTitleArea;//记录提示的标题区域
     //提交按钮
     private Button submitBtn;
     //提交的数据
@@ -85,6 +91,14 @@ public class HomeActivity extends NavBaseActivity {
     private EditText money;
     //地址信息
     private Map<String,String> locationInfo = new HashMap<String,String>();
+    //当前标签列表页数
+    private int page = 1;
+    //是否没有下一页标签数据
+    private boolean tagEnd = false;
+    //下一个和上一页按钮
+    private TextView preTag;
+    private TextView nextTag;
+    //显示要上传的图片
 
     public static final String TAG = "HomeActivity";
 
@@ -149,6 +163,21 @@ public class HomeActivity extends NavBaseActivity {
                 showAddTagDialog();
             }
         });
+        //标签上一页和下一页选择
+        preTag = (TextView)findViewById(R.id.pre_tag);
+        preTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getTagList(v);
+            }
+        });
+        nextTag = (TextView)findViewById(R.id.next_tag);
+        nextTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getTagList(v);
+            }
+        });
         //日期选择
         recordDate = (TextView)findViewById(R.id.record_date);
         Calendar d = Calendar.getInstance(Locale.CHINA);
@@ -164,6 +193,7 @@ public class HomeActivity extends NavBaseActivity {
         recordDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //设置日期选择后的显示格式
                 DatePickerDialog datePickerDialog = new DatePickerDialog(HomeActivity.this, new OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -184,25 +214,50 @@ public class HomeActivity extends NavBaseActivity {
         accountWriteArea = (LinearLayout)findViewById(R.id.account_write_area) ;
         outBtn = (Button)findViewById(R.id.record_type_out);
         inBtn = (Button)findViewById(R.id.record_type_in);
+        recordBtn = (Button)findViewById(R.id.record_type_none);
         showType = (TextView)findViewById(R.id.show_type);
+        //显示记录标题的区域
+        recordTitleArea = (LinearLayout)findViewById(R.id.record_title_area) ;
+        //点击支出
         outBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 recordType = 1;
                 inBtn.setTextColor(getResources().getColor(R.color.grey));
                 outBtn.setTextColor(getResources().getColor(R.color.red));
+                recordBtn.setTextColor(getResources().getColor(R.color.grey));
+                recordTitleArea.setVisibility(View.GONE);
                 showType.setText(outBtn.getText());
                 accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordOut));
+                accountWriteArea.setVisibility(View.VISIBLE);
             }
         });
+        //点击收入
         inBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 recordType = 2;
                 outBtn.setTextColor(getResources().getColor(R.color.grey));
                 inBtn.setTextColor(getResources().getColor(R.color.red));
+                recordBtn.setTextColor(getResources().getColor(R.color.grey));
+                recordTitleArea.setVisibility(View.GONE);
                 showType.setText(inBtn.getText());
                 accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordIn));
+                accountWriteArea.setVisibility(View.VISIBLE);
+            }
+        });
+        recordTitle = (TextView)findViewById(R.id.show_record_title);
+        //点击记录
+        recordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recordType = 0;
+                outBtn.setTextColor(getResources().getColor(R.color.grey));
+                inBtn.setTextColor(getResources().getColor(R.color.grey));
+                recordBtn.setTextColor(getResources().getColor(R.color.red));
+                accountWriteArea.setVisibility(View.GONE);
+                recordTitle.setText(getRecordTitle());
+                recordTitleArea.setVisibility(View.VISIBLE);
             }
         });
         remark = (EditText)findViewById(R.id.record_remark);
@@ -231,6 +286,43 @@ public class HomeActivity extends NavBaseActivity {
                 addOrEditRecord();
             }
         });
+    }
+    /**
+     * 随机生成记录的提示文字
+     */
+    private String getRecordTitle(){
+        String[] titleArray = new String[]{
+                "发生了什么新鲜事",
+                "没事记一下",
+                "今天有啥新闻",
+                "来写一篇日记吧"
+        };
+        int max=titleArray.length;
+        int min=0;
+        Random random = new Random();
+        int s = random.nextInt(max)%(max-min+1) + min;
+        return titleArray[s];
+    }
+
+    /**
+     * 获取推荐标签
+     */
+    private void getTagList(View v){
+        if(R.id.pre_tag==v.getId()){
+            //上一页
+            if(page <= 1){
+                BaseActivity.mToastStatic("已经是第一页了");
+            }else{
+                page = page - 1;
+            }
+        }else{
+            if(tagEnd){
+                BaseActivity.mToastStatic("没有数据了");
+            }else{
+                page = page + 1;
+            }
+        }
+        getShowTagData();
     }
 
     //添加标签弹出框
@@ -316,6 +408,10 @@ public class HomeActivity extends NavBaseActivity {
         postParams.put("type",String.valueOf(recordType));
         //标签id
         postParams.put("tids",checkTagAdapter.getTagIds());
+        if(recordType==0 && "".equals(remark.getText().toString())){
+            mToast("请输入记录内容");
+            return ;
+        }
         //备注
         postParams.put("content",remark.getText().toString());
         //金额
@@ -330,7 +426,7 @@ public class HomeActivity extends NavBaseActivity {
         postParams.put("address",locationInfo.get("street"));
         //日期
         postParams.put("date",recordDate.getText().toString());
-        if("".equals(postParams.get("account"))){
+        if(recordType!=0 && "".equals(postParams.get("account"))){
             mToast("请输入金额");
             return ;
         }
@@ -384,7 +480,7 @@ public class HomeActivity extends NavBaseActivity {
 
     //获取常用的标签
     private void getShowTagData() {
-        String tagUrl = REQUEST_HOST + "/tag/recommend";
+        String tagUrl = REQUEST_HOST + "/tag/recommend?page="+page;
         HttpUtil.postRequest(tagUrl,new HashMap<String, String>() ,new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -406,7 +502,7 @@ public class HomeActivity extends NavBaseActivity {
                     @Override
                     public void run() {
                         if (tag != null && "true".equals(tag.status.toString())) {
-                            showTagAdapter.onlyAddAll(tag.tagList);
+                            showTagAdapter.clearAndAddAll(tag.tagList);
                         } else {
                             BaseActivity.mToastStatic(tag.message);
                         }
