@@ -15,10 +15,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jam00.www.R;
 import com.jam00.www.gson.Login;
 import com.jam00.www.gson.Tag;
 import com.jam00.www.util.ActivityCollector;
+import com.jam00.www.util.BaseApplication;
 import com.jam00.www.util.GlideCircleTransform;
 import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LogUtil;
@@ -46,14 +48,14 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //沉浸式状态栏
-        if (Build.VERSION.SDK_INT >= 21) {
-            //获取当前活动 DecorView
-            View decorView = getWindow().getDecorView();
-            //setSystemUiVisibility 改变系统 UI 显示，表示活动布局会显示在状态栏上
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            //设置状态栏为透明色
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            //获取当前活动 DecorView
+//            View decorView = getWindow().getDecorView();
+//            //setSystemUiVisibility 改变系统 UI 显示，表示活动布局会显示在状态栏上
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            //设置状态栏为透明色
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
         setContentView(R.layout.activity_common);
         //判断是否登录
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -82,7 +84,10 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
 
         //头像
         userHead = (ImageView)findViewById(R.id.user_head);
-        Glide.with(this).load(R.drawable.default_head).transform(new GlideCircleTransform(this)).into(userHead);
+        //Glide 4.0 新方法 RequestOptions
+        RequestOptions options = new RequestOptions();
+        options.transform(new GlideCircleTransform());
+        Glide.with(this).load(R.drawable.default_head).apply(options).into(userHead);
     }
     @Override
     public void onClick(View v){

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "com.jam00.www"
+        applicationId "com.jam00.test"
         minSdkVersion 24
         targetSdkVersion 24
         versionCode 1
@@ -35,7 +35,8 @@ dependencies {
     //json 解析
     compile 'com.google.code.gson:gson:2.7'
     //图片加载
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+//    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.github.LuckSiege.PictureSelector:picture_library:v2.1.7'
     compile 'com.android.support:design:24.2.1'
     testCompile 'junit:junit:4.12'
 }

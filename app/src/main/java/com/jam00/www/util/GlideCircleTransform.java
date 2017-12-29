@@ -11,14 +11,16 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.jam00.www.activity.HomeActivity;
 
+import java.security.MessageDigest;
+
 /**
  * Created by weijingtong20 on 2017/7/25.
  * glide 圆角图片
  */
 
 public class GlideCircleTransform extends BitmapTransformation {
-    public GlideCircleTransform(Context context) {
-        super(context);
+    public GlideCircleTransform() {
+        super();
     }
 
     @Override protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
@@ -49,7 +51,8 @@ public class GlideCircleTransform extends BitmapTransformation {
         return result;
     }
 
-    @Override public String getId() {
-        return getClass().getName();
+    @Override
+    public void updateDiskCacheKey(MessageDigest messageDigest) {
+
     }
 }

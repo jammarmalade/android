@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -85,4 +86,6 @@ public class BaseActivity extends AppCompatActivity {
     public static void mToastStatic(String msg){
         Toast.makeText(BaseApplication.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
+
+
 }

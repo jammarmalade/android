@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,12 +22,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jam00.www.R;
 import com.jam00.www.util.ActivityCollector;
 import com.jam00.www.util.BaseApplication;
@@ -34,6 +38,8 @@ import com.jam00.www.util.GlideCircleTransform;
 import com.jam00.www.util.LogUtil;
 
 import java.lang.reflect.Method;
+
+import static com.luck.picture.lib.tools.ScreenUtils.getStatusBarHeight;
 
 public class NavBaseActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,6 +68,11 @@ public class NavBaseActivity extends BaseActivity
         TextView textView = (TextView) findViewById(R.id.toolbar_title);
         textView.setText(toolBarTitle);
         setSupportActionBar(toolbar);//执行设定
+        //设置透明状态栏， getStatusBarHeight() 方法解决 edittext 弹出键盘时 Toolbar 被移出屏幕
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            toolbar.setPadding(0, getStatusBarHeight(this), 0, 0);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
@@ -83,12 +94,15 @@ public class NavBaseActivity extends BaseActivity
                 String authkey = prefs.getString("authkey",null);
                 String username = prefs.getString("username",null);
                 String head = prefs.getString("head",null);
+                //Glide 4.0 新方法 RequestOptions
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideCircleTransform());
                 if(authkey!=null){
                     if(head!=null){
                         //设置用户头像
-                        Glide.with(BaseApplication.getContext()).load(head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
+                        Glide.with(BaseApplication.getContext()).load(head).apply(options).into(userHead);
                     }else{
-                        Glide.with(BaseApplication.getContext()).load(R.drawable.default_head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
+                        Glide.with(BaseApplication.getContext()).load(R.drawable.default_head).apply(options).into(userHead);
                     }
                     userName.setText(username);
                     userDes.setText(prefs.getString("des",""));
@@ -112,7 +126,7 @@ public class NavBaseActivity extends BaseActivity
                     });
                 }else{
                     //设置用户头像
-                    Glide.with(BaseApplication.getContext()).load(R.drawable.default_head).transform(new GlideCircleTransform(BaseApplication.getContext())).into(userHead);
+                    Glide.with(BaseApplication.getContext()).load(R.drawable.default_head).apply(options).into(userHead);
                     //点击登录前往登录页面
                     userName.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -134,6 +148,26 @@ public class NavBaseActivity extends BaseActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+    }
+    //通过反射获取状态栏高度，默认25dp
+    private static int getStatusBarHeight(Context context) {
+        int statusBarHeight = dip2px(context, 25);
+        try {
+            Class<?> clazz = Class.forName("com.android.internal.R$dimen");
+            Object object = clazz.newInstance();
+            int height = Integer.parseInt(clazz.getField("status_bar_height")
+                    .get(object).toString());
+            statusBarHeight = context.getResources().getDimensionPixelSize(height);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statusBarHeight;
+    }
+
+    //根据手机的分辨率从 dp 的单位 转成为 px(像素)
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 
     @Override
