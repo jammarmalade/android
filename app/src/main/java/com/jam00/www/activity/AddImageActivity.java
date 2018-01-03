@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.jam00.www.R;
 import com.jam00.www.adapter.ViewPagerAdapter;
 import com.jam00.www.util.CancelOrOkDialog;
+import com.jam00.www.util.StatusBarUtil;
 
 import java.util.ArrayList;
 
@@ -30,6 +31,8 @@ public class AddImageActivity extends AppCompatActivity implements ViewPager.OnP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_image);
+        //修改状态栏颜色
+        StatusBarUtil.setWindowStatusBarColor(this,R.color.black);
 
         imgList = getIntent().getStringArrayListExtra("img_list");
         mPosition = getIntent().getIntExtra("position", 0);

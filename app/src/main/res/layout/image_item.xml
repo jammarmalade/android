@@ -4,6 +4,7 @@
     android:layout_height="80dp"
     android:background="@drawable/shape_gray_square_bg"
     android:scaleType="centerCrop"
+    android:padding="1dp"
     android:id="@+id/pre_img">
 
 </ImageView>

@@ -38,6 +38,7 @@ import com.jam00.www.util.BaseApplication;
 import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LbsUtil;
 import com.jam00.www.util.LogUtil;
+import com.jam00.www.util.PictureSelectorConfig;
 import com.jam00.www.util.Utility;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
@@ -108,7 +109,7 @@ public class HomeActivity extends NavBaseActivity {
     private TextView nextTag;
     //显示要上传的图片
     private GridView showImageGridView;
-    private ArrayList<String> mPicList = new ArrayList<>(); //上传的图片凭证的数据源
+    private ArrayList<String> mPicList = new ArrayList<>(); //上传的图片的数据源
     private GridViewAdapter mGridViewAddImgAdapter; //展示上传的图片的适配器
     public static final int MAX_IMAGE_NUM = 9;//最多选择9张图片
     //startActivityForResult 请求码
@@ -294,8 +295,8 @@ public class HomeActivity extends NavBaseActivity {
             }
         });
         //显示图片的区域
-//        showImageGridView = (GridView)findViewById(R.id.select_image_area);
-//        initGridView();
+        showImageGridView = (GridView)findViewById(R.id.select_image_area);
+        initGridView();
         //提交按钮
         submitBtn = (Button)findViewById(R.id.submit_record);
         submitBtn.setOnClickListener(new View.OnClickListener() {
@@ -456,7 +457,7 @@ public class HomeActivity extends NavBaseActivity {
 
         httpSending = true;
         Utility.showProgressDialog(HomeActivity.this,"");
-        HttpUtil.postRequest(url, postParams, new Callback() {
+        HttpUtil.formMultipleUpload(url, postParams,mPicList, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 httpSending = false;
@@ -487,6 +488,9 @@ public class HomeActivity extends NavBaseActivity {
                             //初始化选择标签
                             checkTagAdapter.clearAndAddAll(new ArrayList<TagInfo>());
                             money.requestFocus();
+                            //删除选择的图片
+                            mPicList.clear();
+                            mGridViewAddImgAdapter.notifyDataSetChanged();
                         } else {
                             BaseActivity.mToastStatic(res.message);
                         }
@@ -576,7 +580,7 @@ public class HomeActivity extends NavBaseActivity {
                         //最多添加 9 张图片
                         viewPluImg(position);
                     } else {
-                        //添加凭证图片
+                        //添加图片
                         selectPic(MAX_IMAGE_NUM - mPicList.size());
                     }
                 } else {
@@ -602,9 +606,7 @@ public class HomeActivity extends NavBaseActivity {
      * @param maxTotal 最多选择的图片的数量
      */
     private void selectPic(int maxTotal) {
-//        PictureSelectorConfig.initMultiConfig(this, maxTotal);
-        PictureSelector.create(HomeActivity.this).openGallery(PictureMimeType.ofImage()).maxSelectNum(maxTotal).isCamera(true)
-                .compress(true);
+        PictureSelectorConfig.initMultiConfig(this, maxTotal);
     }
 
     // 处理选择的照片的地址

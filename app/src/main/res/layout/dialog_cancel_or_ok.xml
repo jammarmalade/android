@@ -4,7 +4,8 @@
     android:layout_width="200dp"
     android:layout_height="100dp"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <!--取消确认类型的dialog-->
 
@@ -14,8 +15,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        tools:text="确认已收到货了吗？"
-        android:textColor="#666666"
+        tools:text="确认删除吗？"
+        android:textColor="#000"
         android:layout_marginTop="10dp"/>
 
     <View
@@ -37,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#666666"
+            android:textColor="#000"
             android:text="取消" />
 
         <View
@@ -53,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#cc0033"
+            android:textColor="#c33"
             android:text="确定" />
     </LinearLayout>
 
