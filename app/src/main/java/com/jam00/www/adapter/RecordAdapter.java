@@ -62,14 +62,22 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             case 1:
                 //设置数据
                 final listHolder listHolder = (listHolder)holder;
+                if(recordInfo.type == 0){
+                    listHolder.recordAccount.setText("记录");
+                    listHolder.recordAccount.setTextSize(16);
+                    listHolder.recordAccount.setTextColor(ContextCompat.getColor(mContext,R.color.black));
+                }
                 //金额
                 if(recordInfo.type == 1){
                     account = " - "+recordInfo.account;
                     listHolder.recordAccount.setText(account);
+                    listHolder.recordAccount.setTextSize(20);
+                    listHolder.recordAccount.setTextColor(ContextCompat.getColor(mContext,R.color.red));
                 }
                 if(recordInfo.type == 2){
                     account = " + "+recordInfo.account;
                     listHolder.recordAccount.setText(account);
+                    listHolder.recordAccount.setTextSize(20);
                     listHolder.recordAccount.setTextColor(ContextCompat.getColor(mContext,R.color.green1));
                 }
                 //记录时间

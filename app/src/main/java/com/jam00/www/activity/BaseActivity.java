@@ -1,6 +1,7 @@
 package com.jam00.www.activity;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -17,6 +18,8 @@ import com.jam00.www.R;
 import com.jam00.www.util.ActivityCollector;
 import com.jam00.www.util.BaseApplication;
 import com.jam00.www.util.LogUtil;
+
+import java.lang.ref.WeakReference;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -87,5 +90,80 @@ public class BaseActivity extends AppCompatActivity {
         Toast.makeText(BaseApplication.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
+    //----------------------------------------加载、请求框--------------------------------------
+    private static ProgressDialog progressDialog;
+    private static WeakReference<Activity> mWeakReference;
+    //显示对话框
+    public static void showProgressDialog(Activity activity, String msg) {
+        if(!isLiving(activity)){
+            return;
+        }
+        if(mWeakReference == null){
+            mWeakReference = new WeakReference(activity);
+        }
+
+        activity = mWeakReference.get();
+        if (progressDialog == null) {
+            if (activity.getParent() != null) {
+                progressDialog = new ProgressDialog(activity.getParent());
+            } else {
+                progressDialog = new ProgressDialog(activity);
+            }
+        }
+        if("".equals(msg)){
+            msg = "正在请求...";
+        }
+        progressDialog.setMessage(msg);
+        if (!progressDialog.isShowing()) {
+            progressDialog.dismiss();
+            //点击屏幕其它地方是否会消失
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
+    }
+
+    /**
+     * 判断进度框是否正在显示
+     */
+    private static boolean isShowing(ProgressDialog dialog) {
+        boolean isShowing = dialog != null
+                && dialog.isShowing();
+        LogUtil.d(TAG,">------isShow:"+isShowing);
+        return isShowing;
+    }
+    //关闭对话框
+    public static void closeProgressDialog() {
+        if (isShowing(progressDialog) && isExistLiving(mWeakReference)) {
+            progressDialog.dismiss();
+            progressDialog = null;
+            mWeakReference.clear();
+            mWeakReference = null;
+        }
+    }
+    private static boolean isExistLiving(WeakReference<Activity> weakReference) {
+        if(weakReference != null){
+            Activity activity = weakReference.get();
+            if (activity == null) {
+                return false;
+            }
+            if (activity.isFinishing()) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    //判断Activity是否存活
+    private static boolean isLiving(Activity activity) {
+        if (activity == null) {
+            LogUtil.d(TAG, "activity == null");
+            return false;
+        }
+        if (activity.isFinishing()) {
+            LogUtil.d(TAG, "activity is finishing");
+            return false;
+        }
+        return true;
+    }
 
 }

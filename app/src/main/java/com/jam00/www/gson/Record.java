@@ -2,6 +2,7 @@ package com.jam00.www.gson;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -25,6 +26,7 @@ public class Record {
         public String longitude;
         public String latitude;
         public int status;
+        public String date;
         public String showTime;
         public List<TagInfo> tagList;
 

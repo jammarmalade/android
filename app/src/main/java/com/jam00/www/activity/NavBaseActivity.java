@@ -121,7 +121,7 @@ public class NavBaseActivity extends BaseActivity
                             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                             drawer.closeDrawer(GravityCompat.START);
                             ActivityCollector.finishAll();
-                            HomeActivity.actionStart(NavBaseActivity.this);
+                            HomeActivity.actionStart(NavBaseActivity.this,0);
                         }
                     });
                 }else{
@@ -268,7 +268,7 @@ public class NavBaseActivity extends BaseActivity
 
         if (id == R.id.nav_home) {
             if(!"HomeActivity".equals(activityName)){
-                HomeActivity.actionStart(this);
+                HomeActivity.actionStart(this,0);
             }
         } else if (id == R.id.nav_weather) {
             if(!"ChooseAreaActivity".equals(activityName)){

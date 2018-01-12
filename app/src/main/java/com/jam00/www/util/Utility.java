@@ -30,8 +30,7 @@ import java.util.Date;
  * 工具类
  */
 public class Utility {
-    //加载框
-    private static ProgressDialog progressDialog;
+
 
     /**
      * 解析和处理服务器返回的省级数据
@@ -151,24 +150,4 @@ public class Utility {
         listView.setLayoutParams(params);
     }
 
-    //显示对话框
-    public static void showProgressDialog(Activity activity, String msg) {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(activity);
-            if("".equals(msg)){
-                msg = "正在请求...";
-            }
-            progressDialog.setMessage(msg);
-            //点击屏幕其它地方是否会消失
-            progressDialog.setCanceledOnTouchOutside(false);
-        }
-        progressDialog.show();
-    }
-
-    //关闭对话框
-    public static void closeProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-    }
 }

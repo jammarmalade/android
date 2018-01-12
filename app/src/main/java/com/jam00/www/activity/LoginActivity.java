@@ -61,7 +61,7 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String authkey = prefs.getString("authkey",null);
         if(authkey!=null){
-            HomeActivity.actionStart(this);
+            HomeActivity.actionStart(this,0);
         }
         String username = prefs.getString("username",null);
 
@@ -107,7 +107,7 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
                     mToast("密码最少六位");
                     return ;
                 }
-                Utility.showProgressDialog(LoginActivity.this,"");
+                showProgressDialog(this,"");
                 HashMap<String,String> params = new HashMap<>();
                 params.put("username",username);
                 params.put("password",password);
@@ -116,7 +116,7 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
                     @Override
                     public void onFailure(Call call, IOException e) {
                         BaseActivity.mToastStatic("请求失败");
-                        Utility.closeProgressDialog();
+                        closeProgressDialog();
                     }
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
@@ -135,11 +135,11 @@ public class LoginActivity extends NavBaseActivity implements View.OnClickListen
                                     editor.putString("des",login.userInfo.des);
                                     editor.apply();
                                     ActivityCollector.removeActivity(LoginActivity.this);
-                                    HomeActivity.actionStart(LoginActivity.this);
+                                    HomeActivity.actionStart(LoginActivity.this,0);
                                 } else {
                                     BaseActivity.mToastStatic(login.message);
                                 }
-                                Utility.closeProgressDialog();
+                                closeProgressDialog();
                             }
                         });
                     }

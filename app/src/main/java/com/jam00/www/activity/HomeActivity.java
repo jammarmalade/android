@@ -31,6 +31,7 @@ import com.jam00.www.adapter.GridViewAdapter;
 import com.jam00.www.adapter.TagAdapter;
 import com.jam00.www.custom.flowtaglayout.FlowTagLayout;
 import com.jam00.www.custom.flowtaglayout.OnTagClickListener;
+import com.jam00.www.gson.Record;
 import com.jam00.www.gson.Result;
 import com.jam00.www.gson.Tag;
 import com.jam00.www.gson.TagInfo;
@@ -59,7 +60,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.jam00.www.util.Utility.closeProgressDialog;
 
 public class HomeActivity extends NavBaseActivity {
     //标签
@@ -117,6 +117,8 @@ public class HomeActivity extends NavBaseActivity {
     public static final int RESULT_CODE_VIEW_IMG = 11; //查看大图页面的结果码
 
     public static final String TAG = "HomeActivity";
+    //编辑记录的id
+    private int rid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +133,12 @@ public class HomeActivity extends NavBaseActivity {
 //            getWindow().setStatusBarColor(Color.TRANSPARENT);
 //        }
         setContentView(R.layout.activity_common);
+        //是否是编辑记录
+        rid = getIntent().getIntExtra("rid",0);
+        if(rid > 0){
+            //执行修改初始化
+            initUpdateData();
+        }
         //使用layoutInflater布局
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.content_main);
         LayoutInflater layoutInflater = LayoutInflater.from(this);
@@ -238,28 +246,14 @@ public class HomeActivity extends NavBaseActivity {
         outBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recordType = 1;
-                inBtn.setTextColor(getResources().getColor(R.color.grey));
-                outBtn.setTextColor(getResources().getColor(R.color.red));
-                recordBtn.setTextColor(getResources().getColor(R.color.grey));
-                recordTitleArea.setVisibility(View.GONE);
-                showType.setText(outBtn.getText());
-                accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordOut));
-                accountWriteArea.setVisibility(View.VISIBLE);
+                selectType(1);
             }
         });
         //点击收入
         inBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recordType = 2;
-                outBtn.setTextColor(getResources().getColor(R.color.grey));
-                inBtn.setTextColor(getResources().getColor(R.color.red));
-                recordBtn.setTextColor(getResources().getColor(R.color.grey));
-                recordTitleArea.setVisibility(View.GONE);
-                showType.setText(inBtn.getText());
-                accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordIn));
-                accountWriteArea.setVisibility(View.VISIBLE);
+                selectType(2);
             }
         });
         recordTitle = (TextView)findViewById(R.id.show_record_title);
@@ -267,13 +261,7 @@ public class HomeActivity extends NavBaseActivity {
         recordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recordType = 0;
-                outBtn.setTextColor(getResources().getColor(R.color.grey));
-                inBtn.setTextColor(getResources().getColor(R.color.grey));
-                recordBtn.setTextColor(getResources().getColor(R.color.red));
-                accountWriteArea.setVisibility(View.GONE);
-                recordTitle.setText(getRecordTitle());
-                recordTitleArea.setVisibility(View.VISIBLE);
+                selectType(0);
             }
         });
         remark = (EditText)findViewById(R.id.record_remark);
@@ -305,6 +293,86 @@ public class HomeActivity extends NavBaseActivity {
                 addOrEditRecord();
             }
         });
+    }
+    /**
+     * 初始化修改记录数据
+     */
+    private void initUpdateData(){
+        String url = REQUEST_HOST+"/record/info";
+        HashMap<String ,String> params = new HashMap<>() ;
+        params.put("rid",String.valueOf(rid));
+        HttpUtil.postRequest(url, params, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                BaseActivity.mToastStatic("发送失败");
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responseText = response.body().string();
+                final Record record = (Record) Utility.handleResponse(responseText, Record.class);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (record != null && "true".equals(record.status.toString())) {
+                            Record.info info = record.recordList.get(0);
+                            //记录类型
+                            selectType(info.type);
+                            if(info.type != 0 && info.account > 0){
+                                money.setText(String.valueOf(info.account));
+                            }
+                            //标签内容
+                            for(TagInfo tagInfo:info.tagList){
+                                checkTagAdapter.addDataInfo(tagInfo);
+                            }
+                            checkTagAdapter.notifyDataSet();
+                            //备注
+                            remark.setText(info.content);
+                            //记录日期
+                            recordDate.setText(info.date);
+                            //让时间不能点击
+                            recordDate.setOnClickListener(null);
+                            //隐藏图片上传
+                            findViewById(R.id.show_image_area).setVisibility(View.GONE);
+                            TextView showImageTitle = (TextView)findViewById(R.id.show_image_title);
+                            showImageTitle.setText("编辑暂不支持修改图片");
+                        } else {
+                            BaseActivity.mToastStatic(record.message);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 记录类型选择
+     */
+    public void selectType(int type){
+        recordType = type;
+        if(type == 1){
+            inBtn.setTextColor(getResources().getColor(R.color.grey));
+            outBtn.setTextColor(getResources().getColor(R.color.red));
+            recordBtn.setTextColor(getResources().getColor(R.color.grey));
+            recordTitleArea.setVisibility(View.GONE);
+            showType.setText(outBtn.getText());
+            accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordOut));
+            accountWriteArea.setVisibility(View.VISIBLE);
+        }else if(type == 2){
+            outBtn.setTextColor(getResources().getColor(R.color.grey));
+            inBtn.setTextColor(getResources().getColor(R.color.red));
+            recordBtn.setTextColor(getResources().getColor(R.color.grey));
+            recordTitleArea.setVisibility(View.GONE);
+            showType.setText(inBtn.getText());
+            accountWriteArea.setBackgroundColor(getResources().getColor(R.color.recordIn));
+            accountWriteArea.setVisibility(View.VISIBLE);
+        }else if(type == 0){
+            outBtn.setTextColor(getResources().getColor(R.color.grey));
+            inBtn.setTextColor(getResources().getColor(R.color.grey));
+            recordBtn.setTextColor(getResources().getColor(R.color.red));
+            accountWriteArea.setVisibility(View.GONE);
+            recordTitle.setText(getRecordTitle());
+            recordTitleArea.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -370,7 +438,7 @@ public class HomeActivity extends NavBaseActivity {
                 if (checkTagAdapter.getCount() >= 10) {
                     mToast("最多只能选十个标签");
                 } else {
-                    Utility.showProgressDialog(HomeActivity.this,"");
+                    showProgressDialog(HomeActivity.this,"");
                     //添加标签
                     String url = REQUEST_HOST+"/tag/addtag";
                     HashMap<String ,String> params = new HashMap<String, String>() ;
@@ -379,7 +447,7 @@ public class HomeActivity extends NavBaseActivity {
                         @Override
                         public void onFailure(Call call, IOException e) {
                             BaseActivity.mToastStatic("发送失败");
-                            Utility.closeProgressDialog();
+                            closeProgressDialog();
                         }
 
                         @Override
@@ -398,7 +466,7 @@ public class HomeActivity extends NavBaseActivity {
                                     } else {
                                         BaseActivity.mToastStatic(tag.message);
                                     }
-                                    Utility.closeProgressDialog();
+                                    closeProgressDialog();
                                 }
                             });
                         }
@@ -426,6 +494,8 @@ public class HomeActivity extends NavBaseActivity {
         }
         String url = REQUEST_HOST+"/record/add";
         postParams.put("type",String.valueOf(recordType));
+        //rid
+        postParams.put("rid",String.valueOf(rid));
         //标签id
         postParams.put("tids",checkTagAdapter.getTagIds());
         if(recordType==0 && "".equals(remark.getText().toString())){
@@ -456,7 +526,7 @@ public class HomeActivity extends NavBaseActivity {
         }
 
         httpSending = true;
-        Utility.showProgressDialog(HomeActivity.this,"");
+        showProgressDialog(this,"");
         HttpUtil.formMultipleUpload(url, postParams,mPicList, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -467,7 +537,7 @@ public class HomeActivity extends NavBaseActivity {
                     @Override
                     public void run() {
                         BaseActivity.mToastStatic("提交失败");
-                        Utility.closeProgressDialog();
+                        closeProgressDialog();
                     }
                 });
             }
@@ -491,10 +561,11 @@ public class HomeActivity extends NavBaseActivity {
                             //删除选择的图片
                             mPicList.clear();
                             mGridViewAddImgAdapter.notifyDataSetChanged();
+                            rid = 0;
                         } else {
                             BaseActivity.mToastStatic(res.message);
                         }
-                        Utility.closeProgressDialog();
+                        closeProgressDialog();
                     }
                 });
             }
@@ -649,8 +720,10 @@ public class HomeActivity extends NavBaseActivity {
     /**
      * 启动本 活动
      */
-    public static void actionStart(Context context) {
+    public static void actionStart(Context context, int id) {
         Intent intent = new Intent(context, HomeActivity.class);
+        intent.putExtra("rid",id);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 }
