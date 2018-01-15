@@ -26,9 +26,12 @@ public class Record {
         public String longitude;
         public String latitude;
         public int status;
+        public String imgstatus;
         public String date;
         public String showTime;
+        public String location;
         public List<TagInfo> tagList;
+        public List<ImageInfo> imgList;
 
     }
 }

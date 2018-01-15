@@ -6,11 +6,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jam00.www.R;
 import com.jam00.www.adapter.ViewPagerAdapter;
 import com.jam00.www.util.CancelOrOkDialog;
+import com.jam00.www.util.LogUtil;
 import com.jam00.www.util.StatusBarUtil;
 
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ public class AddImageActivity extends AppCompatActivity implements ViewPager.OnP
     private ArrayList<String> imgList; //图片的数据源
     private int mPosition; //第几张图片
     private ViewPagerAdapter mAdapter;
+    private boolean showDelete;//是否显示删除按钮
+    private ImageView deleteIM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,7 @@ public class AddImageActivity extends AppCompatActivity implements ViewPager.OnP
 
         imgList = getIntent().getStringArrayListExtra("img_list");
         mPosition = getIntent().getIntExtra("position", 0);
+        showDelete = getIntent().getBooleanExtra("showDel", true);
         initView();
     }
 
@@ -43,7 +48,12 @@ public class AddImageActivity extends AppCompatActivity implements ViewPager.OnP
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         positionTv = (TextView) findViewById(R.id.position_tv);
         findViewById(R.id.back_iv).setOnClickListener(this);
-        findViewById(R.id.delete_iv).setOnClickListener(this);
+        deleteIM = (ImageView) findViewById(R.id.delete_iv);
+        if(showDelete){
+            deleteIM.setOnClickListener(this);
+        }else{
+            deleteIM.setVisibility(View.GONE);
+        }
         viewPager.addOnPageChangeListener(this);
 
         mAdapter = new ViewPagerAdapter(this, imgList);

@@ -8,22 +8,27 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jam00.www.R;
+import com.jam00.www.activity.BaseActivity;
 import com.jam00.www.activity.HomeActivity;
+import com.jam00.www.gson.ImageInfo;
+import com.jam00.www.util.GlideCircleTransform;
+import com.jam00.www.util.LogUtil;
 
 import java.util.List;
 
 /**
  * Created by weijingtong20 on 2017/12/29.
- * 上传图片列表
+ * 列表图片
  */
 
-public class GridViewAdapter extends BaseAdapter {
+public class ListGridViewAdapter extends BaseAdapter {
     private Context mContext;
-    private List<String> mList;
+    private List<ImageInfo> mList;
     private LayoutInflater inflater;
 
-    public GridViewAdapter(Context mContext, List<String> mList) {
+    public ListGridViewAdapter(Context mContext, List<ImageInfo> mList) {
         this.mContext = mContext;
         this.mList = mList;
         inflater = LayoutInflater.from(mContext);
@@ -31,13 +36,7 @@ public class GridViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        //最后多了一个添加图片的 ImageView
-        int count = mList == null ? 1 : mList.size() + 1;
-        if (count > HomeActivity.MAX_IMAGE_NUM) {
-            return mList.size();
-        } else {
-            return count;
-        }
+        return mList.size();
     }
 
     @Override
@@ -54,13 +53,11 @@ public class GridViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = inflater.inflate(R.layout.image_item, parent,false);
         ImageView iv = (ImageView) convertView.findViewById(R.id.pre_img);
-        if (position < mList.size()) {
-            //代表+号之前的需要正常显示图片
-            String picUrl = mList.get(position); //图片路径
-            Glide.with(mContext).load(picUrl).into(iv);
-        } else {
-            iv.setImageResource(R.drawable.ic_add_black);//最后一个显示加号图片
-        }
+        ImageInfo imageInfo = mList.get(position); //图片路径
+        //Glide 4.0 新方法 RequestOptions
+        RequestOptions options = new RequestOptions();
+        options.placeholder(R.drawable.ic_launcher_144);
+        Glide.with(mContext).load(imageInfo.thumbUrl).apply(options).into(iv);
         return convertView;
     }
 }

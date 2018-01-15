@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jam00.www.R;
 import com.luck.picture.lib.photoview.PhotoView;
 
@@ -47,7 +48,9 @@ public class ViewPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         View itemView = getItemView(R.layout.view_pager_img);
         PhotoView imageView = (PhotoView) itemView.findViewById(R.id.img_iv);
-        Glide.with(context).load(imgList.get(position)).into(imageView);
+        RequestOptions options = new RequestOptions();
+        options.placeholder(R.drawable.loading);
+        Glide.with(context).load(imgList.get(position)).apply(options).into(imageView);
         container.addView(itemView);
         return itemView;
     }

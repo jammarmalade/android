@@ -128,7 +128,7 @@ public class BaseActivity extends AppCompatActivity {
     private static boolean isShowing(ProgressDialog dialog) {
         boolean isShowing = dialog != null
                 && dialog.isShowing();
-        LogUtil.d(TAG,">------isShow:"+isShowing);
+//        LogUtil.d(TAG,">------isShow:"+isShowing);
         return isShowing;
     }
     //关闭对话框

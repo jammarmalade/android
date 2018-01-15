@@ -36,10 +36,14 @@ public class MapActivity extends BaseActivity {
     //地图总控制器
     private BaiduMap baiduMap;
     private boolean isFirstLocate = true;
+    private double latitude,longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        latitude = getIntent().getDoubleExtra("latitude", 0);
+        longitude = getIntent().getDoubleExtra("longitude", 0);
         //获取定位信息
         lbsUtil = new LbsUtil();
         lbsUtil.getLocation(MapActivity.this, new MapLocationListener());
@@ -87,6 +91,10 @@ public class MapActivity extends BaseActivity {
      */
     private void navigateTo(BDLocation location){
         if(isFirstLocate){
+            if(!"".equals(latitude) && !"".equals(longitude)){
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+            }
             //要移动的坐标点
             LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
             //更新坐标
