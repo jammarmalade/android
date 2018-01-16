@@ -11,10 +11,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -74,6 +78,9 @@ public class RecordActivity extends BaseActivity implements View.OnClickListener
     //加载更多adapter
     private LoadMoreWrapper mLoadMoreWrapper;
 
+    final static int ACTION_SEARCH = Menu.FIRST;
+    final static int ACTION_SELECT_DATE = Menu.FIRST+1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -85,7 +92,11 @@ public class RecordActivity extends BaseActivity implements View.OnClickListener
         commonBtnLeft = (Button)findViewById(R.id.common_btn_left);
         commonBtnLeft.setVisibility(View.VISIBLE);
         commonBtnRight = (Button)findViewById(R.id.common_btn_right);
+        //图标改为搜索
+        commonBtnRight.setBackgroundResource(R.drawable.ic_search_white);
+        commonBtnRight.setVisibility(View.VISIBLE);
         commonBtnLeft.setOnClickListener(this);
+        commonBtnRight.setOnClickListener(this);
         commonTitleBg = (RelativeLayout)findViewById(R.id.common_title_bg);
         //getColor(int id)在API23时过时
         commonTitleBg.setBackgroundColor(ContextCompat.getColor(this,R.color.red1));
@@ -216,8 +227,12 @@ public class RecordActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View v){
         switch (v.getId()){
             case R.id.common_btn_left:
-                ActivityCollector.removeActivity(this);
-                HomeActivity.actionStart(this,0);
+//                ActivityCollector.removeActivity(this);
+//                HomeActivity.actionStart(this,0);
+                finish();
+                break;
+            case R.id.common_btn_right:
+
                 break;
         }
     }

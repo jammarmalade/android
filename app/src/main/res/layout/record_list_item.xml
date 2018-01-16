@@ -35,7 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp">
         <com.jam00.www.custom.flowtaglayout.FlowTagLayout
             android:id="@+id/record_tag_list"
             android:layout_width="wrap_content"
@@ -44,7 +45,6 @@
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:ellipsize="end"
             android:text="我是超长的内容内容内容内容内容内容内容内容内容内容内容内容"
             android:textColor="@color/black"

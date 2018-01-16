@@ -128,7 +128,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 listHolder.location.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        MapActivity.actionStart(mContext,recordInfo.latitude,recordInfo.longitude);
+                        MapActivity.actionStart(mContext,recordInfo.latitude,recordInfo.longitude,recordInfo.location);
                     }
                 });
 

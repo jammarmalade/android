@@ -2,14 +2,19 @@ package com.jam00.www.util;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.jam00.www.activity.BaseActivity;
+import com.jam00.www.activity.WeatherActivity;
 import com.jam00.www.db.City;
 import com.jam00.www.db.County;
 import com.jam00.www.db.Provice;
@@ -22,8 +27,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by weijingtong20 on 2016/12/26.

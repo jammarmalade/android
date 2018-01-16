@@ -11,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +44,6 @@ import okhttp3.Response;
  */
 public class WeatherActivity extends BaseActivity {
 
-    private final String BING_PIC_URL = "http://guolin.tech/api/bing_pic";//获取必应每日一图
     private ScrollView weatherLayout;
     private TextView titleCity;
     private TextView titleUpdateTime;
@@ -131,7 +131,7 @@ public class WeatherActivity extends BaseActivity {
         if(bingPic!=null){
             Glide.with(this).load(bingPic).into(bingPicImg);
         }else{
-            loadBingPic();
+            loadBingPic(this,bingPicImg);
         }
         //切换城市按钮点击事件
         navButton.setOnClickListener(new View.OnClickListener() {
@@ -149,7 +149,7 @@ public class WeatherActivity extends BaseActivity {
         toMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MapActivity.actionStart(WeatherActivity.this,"","");
+                MapActivity.actionStart(WeatherActivity.this,"","","");
             }
         });
 
@@ -201,7 +201,11 @@ public class WeatherActivity extends BaseActivity {
                 });
             }
         });
-        loadBingPic();
+        loadBingPic(this,bingPicImg);
+    }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        finish();
+        return true;
     }
     /**
      * 处理并展示 weather 实体类中的数据
@@ -250,31 +254,7 @@ public class WeatherActivity extends BaseActivity {
             mToast("获取天气信息失败");
         }
     }
-    /**
-     * 获取背景图，必应的每日一图
-     */
-    private void loadBingPic(){
-        HttpUtil.sendOkHttpRequest(BING_PIC_URL, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String bingPic = response.body().string();
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                editor.putString("bing_pic",bingPic);
-                editor.apply();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
-                    }
-                });
-            }
-        });
-    }
     /**
      * 申请定位所需权限
      */

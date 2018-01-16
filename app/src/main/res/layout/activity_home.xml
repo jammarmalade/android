@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_home"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.jam00.www.activity.HomeActivity">
+    <!--FrameLayout 默认情况下会将控件都放在左上角
+    所以ScrollView会完全覆盖ImageView ,ImageView 就会成背景图-->
+    <ImageView
+        android:id="@+id/bing_pic_img"
+        android:alpha="0.5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -355,4 +366,4 @@
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+</FrameLayout>

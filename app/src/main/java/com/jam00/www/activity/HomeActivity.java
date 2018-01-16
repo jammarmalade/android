@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -26,6 +27,7 @@ import android.app.DatePickerDialog.OnDateSetListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.mapapi.map.Text;
+import com.bumptech.glide.Glide;
 import com.jam00.www.R;
 import com.jam00.www.adapter.GridViewAdapter;
 import com.jam00.www.adapter.TagAdapter;
@@ -119,6 +121,7 @@ public class HomeActivity extends NavBaseActivity {
     public static final String TAG = "HomeActivity";
     //编辑记录的id
     private int rid;
+    private ImageView bingPicImg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +150,10 @@ public class HomeActivity extends NavBaseActivity {
 
         toolBarTitle = "记录点滴";
         initNav();
+
+        //背景图
+        bingPicImg = (ImageView)findViewById(R.id.bing_pic_img);
+        loadBingPic(this,bingPicImg);
 
         //选中的标签
         checkFlowTagLayout = (FlowTagLayout) findViewById(R.id.check_flow_layout);

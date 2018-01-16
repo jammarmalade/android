@@ -3,23 +3,33 @@ package com.jam00.www.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.jam00.www.R;
 import com.jam00.www.util.ActivityCollector;
 import com.jam00.www.util.BaseApplication;
+import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LogUtil;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -27,7 +37,8 @@ public class BaseActivity extends AppCompatActivity {
     public static final String AUTH_KEY = "41b1c534a9284d5785e21ef1e3ac38fe";//获取天气的授权key
     private long mExitTime;
 
-//    public static final String REQUEST_HOST = "http://guolin.tech/api/";//请求地址
+    public final String BING_PIC_URL = "http://guolin.tech/api/bing_pic";//获取必应每日一图
+
 //    public static final String REQUEST_HOST = "http://192.168.1.136/advanced/api/web/index.php/v1";//本地
     public static final String REQUEST_HOST = "http://api.jam00.com/v1";//线上
     public static final String USER_AUTH_KEY = "a627Q2FAa9H1xmGLOlONEcAtVw8DMnP2ZfMEi80FJzFs5CJY";//用户登录key
@@ -164,6 +175,36 @@ public class BaseActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 获取背景图，必应的每日一图
+     * @param activity
+     * @param mTextView     放入图片的ImageView
+     */
+    public void loadBingPic(final Activity activity,final ImageView mTextView){
+//        HttpUtil.sendOkHttpRequest(BING_PIC_URL, new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                final String bingPic = response.body().string();
+//                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(activity).edit();
+//                editor.putString("bing_pic",bingPic);
+//                editor.apply();
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Glide.with(activity).load(bingPic).into(mTextView);
+//                    }
+//                });
+//            }
+//        });
+        //http://area.sinaapp.com/bingImg/ 这个链接自动指向每日最新的必应图片
+        Glide.with(activity).load("http://area.sinaapp.com/bingImg/").into(mTextView);
     }
 
 }

@@ -54,7 +54,7 @@ public class AutoUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags ,int startId){
         updateWeather();
-        updateBingPic();
+//        updateBingPic();
         //获取定位信息
 //        getLocation();
         LogUtil.d(TAG, "exe - "+Utility.getNowTime());
