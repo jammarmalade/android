@@ -29,7 +29,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -158,6 +160,16 @@ public class Utility {
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
+    }
+
+    public static String getToday(){
+        Calendar d = Calendar.getInstance(Locale.CHINA);
+        Date myDate = new Date();
+        d.setTime(myDate);
+        int year = d.get(Calendar.YEAR);
+        int month = d.get(Calendar.MONTH) + 1;
+        int day = d.get(Calendar.DAY_OF_MONTH);
+        return year+"-"+month+"-"+day;
     }
 
 }

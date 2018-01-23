@@ -127,12 +127,7 @@ public class WeatherActivity extends BaseActivity {
             }
         });
         //设置背景图
-        String bingPic = prefs.getString("bing_pic",null);
-        if(bingPic!=null){
-            Glide.with(this).load(bingPic).into(bingPicImg);
-        }else{
-            loadBingPic(this,bingPicImg);
-        }
+        loadBingPic(this,bingPicImg);
         //切换城市按钮点击事件
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override

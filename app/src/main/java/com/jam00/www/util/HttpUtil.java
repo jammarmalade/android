@@ -43,8 +43,13 @@ public class HttpUtil {
         //处理参数
         //创建请求的参数body
         FormBody.Builder builder = new FormBody.Builder();
+        String tmpVal = "";
         for (String key : paramsMap.keySet()) {
-            builder.add(key, paramsMap.get(key));
+            tmpVal = paramsMap.get(key);
+            if(tmpVal==null || tmpVal.equals("")){
+                tmpVal = "";
+            }
+            builder.add(key, tmpVal);
         }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BaseApplication.getContext());
         String authkey = prefs.getString("authkey", "");

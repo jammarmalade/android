@@ -18,11 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jam00.www.R;
 import com.jam00.www.util.ActivityCollector;
 import com.jam00.www.util.BaseApplication;
+import com.jam00.www.util.GlideCircleTransform;
 import com.jam00.www.util.HttpUtil;
 import com.jam00.www.util.LogUtil;
+import com.jam00.www.util.Utility;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -204,7 +207,8 @@ public class BaseActivity extends AppCompatActivity {
 //            }
 //        });
         //http://area.sinaapp.com/bingImg/ 这个链接自动指向每日最新的必应图片
-        Glide.with(activity).load("http://area.sinaapp.com/bingImg/").into(mTextView);
+        //禁止每天都使用相同缓存
+        Glide.with(activity).load("http://area.sinaapp.com/bingImg/?"+Utility.getToday()).into(mTextView);
     }
 
 }

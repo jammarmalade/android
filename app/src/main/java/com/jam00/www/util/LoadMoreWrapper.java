@@ -22,9 +22,11 @@ public class LoadMoreWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHo
     private int mLoadMoreLayoutId;
     private LinearLayout loadingArea,loadingEnd;
     private boolean isEnd = false;
+    private int listLimit;
 
-    public LoadMoreWrapper(RecyclerView.Adapter adapter) {
+    public LoadMoreWrapper(RecyclerView.Adapter adapter,int limit) {
         mInnerAdapter = adapter;
+        listLimit = limit;
     }
 
     private boolean hasLoadMore() {
@@ -55,10 +57,14 @@ public class LoadMoreWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
             loadingArea = holder.getView(R.id.loading_area);
             loadingEnd = holder.getView(R.id.loading_end);
+            if(mInnerAdapter.getItemCount() < listLimit){
+                loadingArea.setVisibility(View.GONE);
+                loadingEnd.setVisibility(View.VISIBLE);
+            }
             return holder;
         }
         //若是最后一页就显示没有更多
-        if(isEnd){
+        if(isEnd && loadingArea!=null){
             loadingArea.setVisibility(View.GONE);
             loadingEnd.setVisibility(View.VISIBLE);
         }
